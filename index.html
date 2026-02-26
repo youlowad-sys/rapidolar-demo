@@ -466,41 +466,62 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 }
 
 /* ═══════════════════════════════════════════════
-   MOBILE LANDSCAPE — almost desktop layout
-   Phone turned sideways (~844px wide, ~390px tall)
+   MOBILE LANDSCAPE — phone sideways (~844px wide, ~390px tall)
+   Side-by-side layout, everything compact to fit short height
    ═══════════════════════════════════════════════ */
 @media(max-height:500px) and (orientation:landscape){
-  /* Split sections — side by side like desktop */
-  .s--split{flex-direction:row !important;height:100vh !important;height:100dvh !important}
-  .half{flex:1 !important;width:auto !important;padding:clamp(8px,1.5vh,12px) clamp(10px,2vw,20px)}
+  /* ALL sections: auto height, no clipping, proper separation */
+  .s{height:auto !important;min-height:100vh;min-height:100dvh;overflow:visible !important}
+  .s::after{display:none}
 
-  /* Hero — compact for short height */
-  .hero-t{font-size:clamp(28px,8vw,56px) !important;margin-bottom:8px !important}
-  .h-stats{display:flex !important;flex-wrap:nowrap !important;gap:clamp(10px,2vw,24px);margin-top:10px}
-  .h-stat__n{font-size:clamp(20px,3vw,36px) !important}
-  .h-stat__l{font-size:clamp(7px,.7vw,10px) !important}
+  /* Split sections — side by side, each half scrolls if needed */
+  .s--split{flex-direction:row !important;align-items:flex-start !important}
+  .half{flex:1 !important;width:50% !important;padding:8px 12px !important;overflow:visible}
 
-  /* Typography — slightly smaller for height */
-  h2{font-size:clamp(16px,3vw,28px) !important}
-  .desc{font-size:clamp(11px,1.3vw,15px) !important}
-  .label{font-size:clamp(8px,.8vw,11px)}
-  .inner{padding:clamp(8px,1.5vh,16px) clamp(12px,2vw,24px) !important}
+  /* Hero — very compact */
+  .hero-t{font-size:clamp(24px,6vw,44px) !important;margin-bottom:4px !important}
+  .h-stats{display:flex !important;flex-wrap:nowrap !important;gap:8px;margin-top:6px}
+  .h-stat__n{font-size:clamp(16px,2.5vw,28px) !important}
+  .h-stat__l{font-size:clamp(6px,.65vw,8px) !important;margin-top:2px}
+  .desc{font-size:clamp(9px,1.1vw,12px) !important;line-height:1.5 !important}
+  .label{font-size:clamp(7px,.7vw,9px) !important;margin-bottom:4px !important}
 
-  /* Canvas — fit in half-screen height */
-  .pipe-viz{height:clamp(180px,70vh,300px) !important}
-  .donut-viz{height:clamp(200px,75vh,320px) !important}
-  .orbit-viz{height:clamp(200px,75vh,320px) !important}
+  /* Typography — small for short screens */
+  h2{font-size:clamp(14px,2.5vw,22px) !important;margin-bottom:4px !important}
+  .inner{padding:6px 14px !important}
 
-  /* Hide scroll cue, slim down padding */
-  .cue{display:none}
-  .nav{display:none}
+  /* Canvas — small to fit ~390px height, side by side with text */
+  .pipe-viz{height:clamp(160px,80vh,280px) !important;max-width:100% !important}
+  .donut-viz{height:clamp(160px,80vh,280px) !important;max-width:100% !important}
+  .orbit-viz{height:clamp(160px,80vh,280px) !important;max-width:100% !important}
 
-  /* Cinema */
-  .cine{height:auto !important;min-height:70vh}
+  /* Lists inside s3/s4 — tiny */
+  .s--split ul{font-size:clamp(8px,1vw,11px) !important;line-height:1.5 !important;margin:2px 0 !important}
+  .s--split blockquote{font-size:clamp(8px,1vw,11px) !important;padding:4px 0 4px 8px !important;margin:4px 0 !important}
+  .orbit-li{font-size:clamp(8px,1vw,11px) !important;margin-bottom:2px !important}
 
-  /* Performance */
+  /* Timeline (s5) — compact */
+  .tl-detail{font-size:clamp(9px,1.1vw,12px) !important;padding:6px !important}
+
+  /* Transaction flow (s6) — compact */
+  .txn-timer{font-size:clamp(16px,3vw,24px) !important}
+  .txn-metrics{gap:6px !important}
+  .txn-m{padding:6px !important}
+  .txn-m__n{font-size:clamp(16px,2.5vw,24px) !important}
+  .txn-m__t{font-size:clamp(6px,.6vw,8px) !important}
+  .txn-m__d{font-size:clamp(7px,.8vw,9px) !important}
+
+  /* Cinema (s7) */
+  .cine{height:auto !important;min-height:60vh}
+
+  /* Hide extras */
+  .cue{display:none !important}
+  .nav{display:none !important}
   .glow{display:none !important}
   .mesh__b:nth-child(n+4){display:none}
+
+  /* Edge glow between sections as separator */
+  .s+.s{border-top:1px solid rgba(255,255,255,.04)}
 }
 
 /* ═══ VIDEO BACKGROUND ═══ */
