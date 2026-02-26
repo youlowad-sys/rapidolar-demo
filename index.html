@@ -410,11 +410,10 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 
   /* Hero stats — 4 in a row, like desktop */
   .hero-t{font-size:clamp(36px,11vw,60px) !important}
-  .h-stats{display:flex !important;flex-direction:row !important;flex-wrap:nowrap !important;gap:clamp(4px,1vw,10px) !important;margin-top:14px;justify-content:space-between;width:100%}
-  .h-stat{flex:1 1 0 !important;min-width:0 !important;overflow:hidden}
-  .h-stat__n{font-size:clamp(16px,4.5vw,26px) !important;white-space:nowrap}
-  .h-stat__l{font-size:clamp(5px,1.3vw,7px) !important;letter-spacing:0 !important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .h-stat__l span{display:none !important}
+  .h-stats{display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:6px !important;margin-top:14px;width:100%}
+  .h-stat{min-width:0 !important;overflow-wrap:break-word;word-break:break-word}
+  .h-stat__n{font-size:clamp(16px,4.5vw,24px) !important;white-space:nowrap}
+  .h-stat__l{font-size:clamp(6px,1.5vw,8px) !important;letter-spacing:0 !important;line-height:1.3;margin-top:3px}
 
   /* Typography — proportional */
   h2{font-size:clamp(18px,5vw,26px) !important;line-height:1.15}
