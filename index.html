@@ -408,11 +408,12 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .s--split{flex-direction:column !important;height:auto !important;min-height:100vh;min-height:100dvh}
   .half{width:100% !important;flex:none !important;padding:clamp(8px,1.5vh,14px) clamp(10px,3vw,16px)}
 
-  /* Hero stats — 2x2 grid so they fit on 390px */
+  /* Hero stats — 4 in a row, like desktop */
   .hero-t{font-size:clamp(36px,11vw,60px) !important}
-  .h-stats{display:grid !important;grid-template-columns:1fr 1fr;gap:12px 16px;margin-top:14px}
-  .h-stat__n{font-size:clamp(22px,6vw,32px)}
-  .h-stat__l{font-size:clamp(7px,1.8vw,9px);letter-spacing:0.5px}
+  .h-stats{display:flex !important;flex-wrap:nowrap !important;gap:clamp(6px,1.5vw,12px);margin-top:14px;justify-content:space-between}
+  .h-stat{flex:1;min-width:0}
+  .h-stat__n{font-size:clamp(14px,4.2vw,24px);white-space:nowrap}
+  .h-stat__l{font-size:clamp(5px,1.4vw,7px);letter-spacing:0.3px;white-space:nowrap}
 
   /* Typography — proportional */
   h2{font-size:clamp(18px,5vw,26px) !important;line-height:1.15}
