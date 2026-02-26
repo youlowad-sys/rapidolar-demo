@@ -389,82 +389,75 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 @media(max-height:700px) and (min-width:901px){h2{font-size:clamp(22px,3.5vw,38px)}.hero-t{font-size:clamp(48px,10vw,120px)}.h-stats{margin-top:16px;gap:20px}}
 @media(max-height:600px) and (min-width:901px){.desc{display:none}.cue{display:none}.h-stat__l{display:none}.hero-t{font-size:clamp(40px,9vw,100px);margin-bottom:12px}h2{font-size:clamp(18px,3vw,30px)}}
 @media(max-height:500px){.hero-t{font-size:clamp(32px,8vw,72px)}h2{font-size:clamp(16px,2.5vw,24px)}.h-stats{display:none}}
-@media(max-width:900px){.s--split{flex-direction:column}.half{padding:clamp(16px,3vh,32px) clamp(16px,3vw,32px)}}
+@media(max-width:900px){.half{padding:clamp(10px,2vh,20px) clamp(10px,2vw,20px)}}
 @media(max-width:600px){.h-stats{gap:16px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.r,.js .r{opacity:1;transform:none;filter:none;transition:none}*{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}.mesh__b{animation:none!important}.glow{display:none}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.15);border-radius:2px}
 
 /* ═══════════════════════════════════════════════
-   MOBILE — phone support (keep horizontal layouts!)
+   MOBILE — keep everything HORIZONTAL, just scale down
    ═══════════════════════════════════════════════ */
-@media(max-width:900px){
-  /* Sections — auto height, NO overflow clip, NO snap */
-  .s{height:auto;min-height:100vh;min-height:100dvh;overflow:visible;scroll-snap-align:none}
-
-  /* Split sections stay as column but both halves visible */
-  .half{padding:clamp(12px,2vh,20px) clamp(12px,3vw,20px)}
-
-  /* Canvas vizzes — fit mobile */
-  .pipe-viz{max-width:100%;height:clamp(200px,32vh,280px)}
-  .donut-viz{max-width:100%;height:clamp(240px,35vh,320px)}
-  .orbit-viz{max-width:100%;height:clamp(240px,35vh,320px)}
-
-  /* Hide cursor glow + reduce effects */
-  .glow{display:none !important}
-  .mesh__b:nth-child(n+5){display:none}
-  body::after{opacity:.003}
-}
-
 @media(max-width:600px){
-  /* Hero — keep stats HORIZONTAL */
-  .hero-t{font-size:clamp(36px,12vw,64px) !important}
-  .h-stats{gap:clamp(10px,3vw,20px);margin-top:14px}
-  .h-stat__n{font-size:clamp(22px,6vw,36px)}
-  .h-stat__l{font-size:clamp(8px,2vw,10px)}
+  /* Sections — allow overflow so nothing gets clipped */
+  .s{overflow:visible}
 
-  /* Typography */
-  h2{font-size:clamp(20px,5vw,28px) !important;line-height:1.15}
-  .desc{font-size:clamp(12px,3vw,15px) !important}
-  .label{font-size:clamp(9px,2.2vw,11px);letter-spacing:2px}
+  /* Hero stats — force horizontal, shrink to fit */
+  .hero-t{font-size:clamp(32px,11vw,60px) !important}
+  .h-stats{gap:clamp(8px,2vw,16px);margin-top:12px;flex-wrap:nowrap}
+  .h-stat__n{font-size:clamp(18px,5vw,30px)}
+  .h-stat__l{font-size:clamp(7px,1.7vw,9px);letter-spacing:0.5px}
 
-  /* Padding */
-  .inner{padding:clamp(14px,2.5vh,24px) clamp(12px,3vw,18px) !important}
+  /* Typography — proportional */
+  h2{font-size:clamp(16px,4.5vw,24px) !important;line-height:1.15}
+  .desc{font-size:clamp(11px,2.8vw,14px) !important}
+  .label{font-size:clamp(8px,2vw,10px);letter-spacing:1.5px}
 
-  /* Transaction pipe (s6) — keep HORIZONTAL, just smaller */
-  .txn-step{width:clamp(50px,14vw,70px)}
-  .txn-dot{width:24px;height:24px}
-  .txn-lbl{font-size:clamp(6px,1.6vw,8px)}
-  .txn-sub{font-size:6px}
-  .txn-timer{font-size:clamp(20px,5.5vw,30px)}
+  /* Padding — tighter */
+  .inner{padding:clamp(12px,2vh,20px) clamp(10px,2.5vw,16px) !important}
+  .half{padding:clamp(8px,1.5vh,14px) clamp(6px,1.5vw,12px)}
 
-  /* Transaction metrics — keep 3 columns HORIZONTAL */
-  .txn-metrics{gap:6px}
-  .txn-m{padding:10px 8px}
-  .txn-m__n{font-size:clamp(22px,5.5vw,32px)}
-  .txn-m__t{font-size:clamp(7px,1.8vw,9px)}
-  .txn-m__d{font-size:clamp(9px,2.2vw,11px)}
+  /* Split sections — stay as ROW, shrink canvas */
+  .pipe-viz{height:clamp(180px,50vw,260px)}
+  .donut-viz{height:clamp(200px,50vw,280px)}
+  .orbit-viz{height:clamp(200px,50vw,280px)}
 
-  /* ROI — keep 2 columns HORIZONTAL */
-  .roi-input{gap:8px}
-  .roi-input input{width:100px}
-  .roi-m{font-size:clamp(10px,2.5vw,12px)}
-  .roi-card{padding:12px}
-  .roi-card__tag{font-size:clamp(8px,2vw,10px)}
+  /* Transaction pipe (s6) — horizontal, smaller */
+  .txn-step{width:clamp(46px,12vw,64px)}
+  .txn-dot{width:22px;height:22px}
+  .txn-lbl{font-size:clamp(6px,1.5vw,8px)}
+  .txn-sub{font-size:5px}
+  .txn-timer{font-size:clamp(18px,5vw,28px)}
+
+  /* Transaction metrics — 3 columns horizontal */
+  .txn-metrics{gap:4px}
+  .txn-m{padding:8px 6px}
+  .txn-m__n{font-size:clamp(18px,4.5vw,28px)}
+  .txn-m__t{font-size:clamp(6px,1.5vw,8px);letter-spacing:0.5px}
+  .txn-m__d{font-size:clamp(8px,2vw,10px)}
+
+  /* ROI — 2 columns horizontal */
+  .roi-m{font-size:clamp(9px,2.3vw,11px)}
+  .roi-card{padding:10px}
+  .roi-card__tag{font-size:clamp(7px,1.8vw,9px)}
+  .roi-input label{font-size:clamp(10px,2.5vw,12px)}
+  .roi-input input{width:90px;font-size:14px;padding:6px 8px}
 
   /* CTA */
-  .cta-btn{padding:14px 28px;font-size:clamp(14px,3.5vw,16px)}
+  .cta-btn{padding:12px 24px;font-size:clamp(13px,3.5vw,16px)}
 
-  /* Claims table */
+  /* Claims table — scrollable */
   .cl-wrap{-webkit-overflow-scrolling:touch}
-  .cl-t{min-width:480px}
+  .cl-t{min-width:460px}
 
-  /* Timeline (s5) — keep HORIZONTAL steps */
-  .tl-l{font-size:clamp(7px,1.6vw,9px)}
-  .tl-n{width:18px;height:18px;font-size:8px}
-  .tl-detail{font-size:clamp(11px,2.8vw,14px);padding:10px}
+  /* Timeline (s5) */
+  .tl-l{font-size:clamp(6px,1.5vw,8px)}
+  .tl-n{width:16px;height:16px;font-size:7px}
+  .tl-detail{font-size:clamp(10px,2.5vw,13px);padding:8px}
 
-  /* Cinema (s7) */
-  .cine{border-radius:8px}
+  /* Hide cursor glow + performance */
+  .glow{display:none !important}
+  .mesh__b:nth-child(n+4){display:none}
+  body::after{opacity:.002}
 }
 
 /* ═══ VIDEO BACKGROUND ═══ */
