@@ -390,36 +390,42 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 @media(max-height:600px) and (min-width:901px){.desc{display:none}.cue{display:none}.h-stat__l{display:none}.hero-t{font-size:clamp(40px,9vw,100px);margin-bottom:12px}h2{font-size:clamp(18px,3vw,30px)}}
 @media(max-height:500px){.hero-t{font-size:clamp(32px,8vw,72px)}h2{font-size:clamp(16px,2.5vw,24px)}.h-stats{display:none}}
 @media(max-width:900px){.half{padding:clamp(10px,2vh,20px) clamp(10px,2vw,20px)}}
-@media(max-width:600px){.h-stats{gap:16px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.r,.js .r{opacity:1;transform:none;filter:none;transition:none}*{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}.mesh__b{animation:none!important}.glow{display:none}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.15);border-radius:2px}
 
 /* ═══════════════════════════════════════════════
    MOBILE — keep everything HORIZONTAL, just scale down
    ═══════════════════════════════════════════════ */
+/* ═══ TABLET — split sections stack vertically ═══ */
+@media(max-width:900px){
+  .s--split{flex-direction:column !important;height:auto !important;min-height:100vh;min-height:100dvh}
+  .half{width:100% !important;flex:none !important}
+}
+
 @media(max-width:600px){
   /* Sections — allow overflow so nothing gets clipped */
-  .s{overflow:visible}
+  .s{overflow:visible !important}
+  .s--split{flex-direction:column !important;height:auto !important;min-height:100vh;min-height:100dvh}
+  .half{width:100% !important;flex:none !important;padding:clamp(8px,1.5vh,14px) clamp(10px,3vw,16px)}
 
-  /* Hero stats — force horizontal, shrink to fit */
-  .hero-t{font-size:clamp(32px,11vw,60px) !important}
-  .h-stats{gap:clamp(8px,2vw,16px);margin-top:12px;flex-wrap:nowrap}
-  .h-stat__n{font-size:clamp(18px,5vw,30px)}
-  .h-stat__l{font-size:clamp(7px,1.7vw,9px);letter-spacing:0.5px}
+  /* Hero stats — 2x2 grid so they fit on 390px */
+  .hero-t{font-size:clamp(36px,11vw,60px) !important}
+  .h-stats{display:grid !important;grid-template-columns:1fr 1fr;gap:12px 16px;margin-top:14px}
+  .h-stat__n{font-size:clamp(22px,6vw,32px)}
+  .h-stat__l{font-size:clamp(7px,1.8vw,9px);letter-spacing:0.5px}
 
   /* Typography — proportional */
-  h2{font-size:clamp(16px,4.5vw,24px) !important;line-height:1.15}
-  .desc{font-size:clamp(11px,2.8vw,14px) !important}
+  h2{font-size:clamp(18px,5vw,26px) !important;line-height:1.15}
+  .desc{font-size:clamp(12px,3vw,15px) !important}
   .label{font-size:clamp(8px,2vw,10px);letter-spacing:1.5px}
 
   /* Padding — tighter */
   .inner{padding:clamp(12px,2vh,20px) clamp(10px,2.5vw,16px) !important}
-  .half{padding:clamp(8px,1.5vh,14px) clamp(6px,1.5vw,12px)}
 
-  /* Split sections — stay as ROW, shrink canvas */
-  .pipe-viz{height:clamp(180px,50vw,260px)}
-  .donut-viz{height:clamp(200px,50vw,280px)}
-  .orbit-viz{height:clamp(200px,50vw,280px)}
+  /* Canvas containers — full width, proper height */
+  .pipe-viz{width:100% !important;max-width:100% !important;height:clamp(260px,65vw,360px) !important}
+  .donut-viz{width:100% !important;max-width:100% !important;height:clamp(280px,72vw,380px) !important}
+  .orbit-viz{width:100% !important;max-width:100% !important;height:clamp(280px,72vw,380px) !important}
 
   /* Transaction pipe (s6) — horizontal, smaller */
   .txn-step{width:clamp(46px,12vw,64px)}
@@ -429,7 +435,7 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .txn-timer{font-size:clamp(18px,5vw,28px)}
 
   /* Transaction metrics — 3 columns horizontal */
-  .txn-metrics{gap:4px}
+  .txn-metrics{gap:6px}
   .txn-m{padding:8px 6px}
   .txn-m__n{font-size:clamp(18px,4.5vw,28px)}
   .txn-m__t{font-size:clamp(6px,1.5vw,8px);letter-spacing:0.5px}
@@ -453,6 +459,9 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .tl-l{font-size:clamp(6px,1.5vw,8px)}
   .tl-n{width:16px;height:16px;font-size:7px}
   .tl-detail{font-size:clamp(10px,2.5vw,13px);padding:8px}
+
+  /* Cinema (s7) — smaller */
+  .cine{height:auto !important;min-height:60vh}
 
   /* Hide cursor glow + performance */
   .glow{display:none !important}
@@ -1575,6 +1584,7 @@ document.querySelectorAll('[data-count]').forEach(el=>cntObs.observe(el));
 
   function draw(ts){
     if(!running)return;
+    if(W<10||H<10)resize();
     var dt=(ts-lastT)/1000;lastT=ts;
     angle+=dt*0.3;/* slow rotation */
 
@@ -1648,9 +1658,9 @@ document.querySelectorAll('[data-count]').forEach(el=>cntObs.observe(el));
   }
 
   var oObs=new IntersectionObserver(function(e){e.forEach(function(x){
-    if(x.isIntersecting&&!running){running=true;resize();lastT=performance.now();requestAnimationFrame(draw)}
+    if(x.isIntersecting&&!running){running=true;resize();if(W<10||H<10){setTimeout(function(){resize();lastT=performance.now();requestAnimationFrame(draw)},200)}else{lastT=performance.now();requestAnimationFrame(draw)}}
     else if(!x.isIntersecting){running=false}
-  })},{threshold:.2});
+  })},{threshold:.05});
   oObs.observe(box);
 })();
 
@@ -1861,6 +1871,7 @@ document.addEventListener('keydown',e=>{
 
   function loop(){
     if(!running)return;
+    if(W<10||H<10)resize();
     ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
     ctx.clearRect(0,0,W,H);
     drawBg();
@@ -1882,9 +1893,9 @@ document.addEventListener('keydown',e=>{
   }
 
   var pObs=new IntersectionObserver(function(e){e.forEach(function(x){
-    if(x.isIntersecting&&!running){running=true;stats.ok=stats.err=stats.dis=stats.del=0;pkts.length=0;frame=0;resize();loop()}
+    if(x.isIntersecting&&!running){running=true;stats.ok=stats.err=stats.dis=stats.del=0;pkts.length=0;frame=0;resize();if(W<10||H<10){setTimeout(function(){resize();loop()},200)}else{loop()}}
     else if(!x.isIntersecting){running=false}
-  })},{threshold:.15});
+  })},{threshold:.05});
   pObs.observe(box);
 })();
 
@@ -1946,6 +1957,7 @@ document.addEventListener('keydown',e=>{
   cvs.addEventListener('touchend',function(){mx=my=-1;hov=-1;if(done)draw()});
 
   function draw(){
+    if(W<10||H<10)resize();
     ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
     var cx=W/2,cy=H*0.44,R=Math.min(W,H*0.8)*0.26,r=R*0.55,sa=-Math.PI/2;
 
@@ -2025,9 +2037,9 @@ document.addEventListener('keydown',e=>{
   }
 
   var dObs=new IntersectionObserver(function(e){e.forEach(function(x){
-    if(x.isIntersecting&&!running){running=true;done=false;sT=null;prog=0;resize();requestAnimationFrame(anim)}
+    if(x.isIntersecting&&!running){running=true;done=false;sT=null;prog=0;resize();if(W<10||H<10){setTimeout(function(){resize();requestAnimationFrame(anim)},200)}else{requestAnimationFrame(anim)}}
     else if(!x.isIntersecting){running=false;done=false}
-  })},{threshold:.2});
+  })},{threshold:.05});
   dObs.observe(box);
 })();
 
@@ -2040,6 +2052,13 @@ document.addEventListener('keydown',e=>{
 setTimeout(function(){
   document.querySelectorAll('.r:not(.v)').forEach(function(el){el.classList.add('v')});
 },3000);
+
+/* ═══ MOBILE CANVAS SAFETY — force resize on orientation/load ═══ */
+function forceCanvasResize(){
+  window.dispatchEvent(new Event('resize'));
+}
+window.addEventListener('orientationchange',function(){setTimeout(forceCanvasResize,300)});
+window.addEventListener('load',function(){setTimeout(forceCanvasResize,500);setTimeout(forceCanvasResize,1500)});
 </script>
 </body>
 </html>
