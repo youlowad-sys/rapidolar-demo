@@ -389,8 +389,6 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 @media(max-height:700px) and (min-width:901px){h2{font-size:clamp(22px,3.5vw,38px)}.hero-t{font-size:clamp(48px,10vw,120px)}.h-stats{margin-top:16px;gap:20px}}
 @media(max-height:600px) and (min-width:901px){.desc{display:none}.cue{display:none}.h-stat__l{display:none}.hero-t{font-size:clamp(40px,9vw,100px);margin-bottom:12px}h2{font-size:clamp(18px,3vw,30px)}}
 @media(max-height:500px){.hero-t{font-size:clamp(32px,8vw,72px)}h2{font-size:clamp(16px,2.5vw,24px)}.h-stats{display:none}}
-/* Landscape phone — compact layout */
-@media(max-height:500px) and (max-width:900px){.s{height:auto;min-height:100vh;min-height:100dvh}.desc{font-size:clamp(11px,2.5vw,14px) !important}h2{font-size:clamp(18px,4vw,26px) !important}.donut-viz,.orbit-viz,.pipe-viz{height:clamp(200px,50vw,300px)}}
 @media(max-width:900px){.s--split{flex-direction:column}.half{padding:clamp(16px,3vh,32px) clamp(16px,3vw,32px)}}
 @media(max-width:600px){.h-stats{gap:16px;flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.r,.js .r{opacity:1;transform:none;filter:none;transition:none}*{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}.mesh__b{animation:none!important}.glow{display:none}}
@@ -400,98 +398,66 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
    MOBILE — full phone support
    ═══════════════════════════════════════════════ */
 @media(max-width:900px){
-  /* Split sections: stack vertically, allow scroll if content overflows */
-  .s--split{height:auto;min-height:100vh;min-height:100dvh}
-  .s{overflow-y:auto;overflow-x:hidden}
+  /* Sections — remove fixed height, let content flow naturally */
+  .s{height:auto;min-height:100vh;min-height:100dvh;scroll-snap-align:none}
 
-  /* Canvas vizzes — shrink for phone screens */
-  .pipe-viz{max-width:100%;height:clamp(220px,40vh,320px)}
-  .donut-viz{max-width:100%;height:clamp(300px,45vh,400px)}
-  .orbit-viz{max-width:100%;height:clamp(300px,45vh,400px)}
+  /* Canvas vizzes — smaller */
+  .pipe-viz{max-width:90%;height:clamp(200px,35vh,280px)}
+  .donut-viz{max-width:90%;height:clamp(260px,38vh,340px)}
+  .orbit-viz{max-width:90%;height:clamp(260px,38vh,340px)}
 
-  /* Half sections — reduce padding, center canvas */
-  .half{align-items:center !important}
+  /* Cursor glow — hide on mobile */
+  .glow{display:none !important}
+
+  /* Performance */
+  .mesh__b:nth-child(n+5){display:none}
+  body::after{opacity:.003}
 }
 
 @media(max-width:600px){
   /* Hero */
-  .hero-t{font-size:clamp(40px,14vw,80px) !important}
-  .h-stats{flex-direction:column;gap:16px;margin-top:20px}
-  .h-stat{text-align:center}
-  .h-stat__n{font-size:clamp(28px,8vw,44px)}
-  .h-stat__l{font-size:clamp(10px,2.5vw,12px)}
+  .hero-t{font-size:clamp(36px,13vw,72px) !important}
+  .h-stats{flex-wrap:wrap;gap:14px;margin-top:16px}
+  .h-stat__n{font-size:clamp(28px,7vw,40px)}
+  .h-stat__l{font-size:clamp(9px,2.2vw,11px)}
 
-  /* Typography */
-  h2{font-size:clamp(22px,6vw,32px) !important}
-  .desc{font-size:clamp(13px,3.5vw,16px) !important}
-  .label{font-size:clamp(10px,2.5vw,12px);letter-spacing:2px}
+  /* Typography — scale down proportionally */
+  h2{font-size:clamp(20px,5.5vw,30px) !important;line-height:1.15}
+  .desc{font-size:clamp(13px,3.2vw,15px) !important}
+  .label{font-size:clamp(9px,2.2vw,11px);letter-spacing:2px}
 
-  /* Split sections — orbit list */
-  .orbit-li span{font-size:clamp(12px,3vw,14px) !important}
-  .orbit-li strong{font-size:clamp(13px,3.5vw,15px) !important}
+  /* Padding */
+  .inner{padding:clamp(16px,3vh,28px) clamp(14px,3vw,20px) !important}
+  .half{padding:clamp(14px,2.5vh,24px) clamp(12px,3vw,20px)}
 
-  /* Donut list (s3) */
-  #s3 ul{font-size:clamp(11px,3vw,13px) !important}
-  #s3 blockquote{font-size:clamp(13px,3.5vw,15px) !important}
-
-  /* Transaction pipe (s6) — horizontal scroll or shrink */
-  .txn-pipe{gap:0;overflow-x:auto;justify-content:flex-start;padding:0 8px}
-  .txn-step{width:clamp(56px,16vw,80px);flex-shrink:0}
-  .txn-dot{width:28px;height:28px}
-  .txn-lbl{font-size:clamp(7px,2vw,9px)}
+  /* Transaction pipe (s6) */
+  .txn-step{width:clamp(54px,15vw,72px)}
+  .txn-dot{width:26px;height:26px}
+  .txn-lbl{font-size:clamp(7px,1.8vw,9px)}
   .txn-sub{font-size:7px}
-  .txn-timer{font-size:clamp(24px,7vw,36px)}
-
-  /* Transaction metrics — single column */
-  .txn-metrics{grid-template-columns:1fr;gap:10px}
-  .txn-m{padding:14px 16px}
-  .txn-m__n{font-size:clamp(28px,7vw,38px)}
-  .txn-m__d{font-size:clamp(12px,3vw,14px)}
+  .txn-timer{font-size:clamp(22px,6vw,32px)}
+  .txn-metrics{grid-template-columns:1fr;gap:8px}
+  .txn-m{padding:12px 14px}
+  .txn-m__n{font-size:clamp(26px,6.5vw,36px)}
+  .txn-m__d{font-size:clamp(11px,2.8vw,13px)}
 
   /* ROI calculator */
-  .roi-input{flex-direction:column;align-items:flex-start;gap:8px}
+  .roi-input{flex-direction:column;align-items:stretch;gap:8px}
   .roi-input input{width:100%}
-  .roi-m{font-size:clamp(11px,3vw,13px) !important}
-  .roi-card__tag{font-size:clamp(9px,2.5vw,11px)}
-  .roi-card{padding:16px}
+  .roi-m{font-size:clamp(11px,2.8vw,13px)}
+  .roi-card{padding:14px}
 
   /* CTA */
-  .cta-btn{padding:16px 32px;font-size:clamp(14px,4vw,17px);width:100%;text-align:center}
+  .cta-btn{padding:14px 28px;font-size:clamp(14px,3.8vw,17px)}
 
-  /* Claims table — horizontal scroll */
+  /* Claims table */
   .cl-wrap{-webkit-overflow-scrolling:touch}
-  .cl-t{min-width:500px}
+  .cl-t{min-width:480px}
 
   /* Timeline (s5) */
-  .tl-l{font-size:clamp(8px,2vw,10px)}
-  .tl-n{width:22px;height:22px;font-size:10px}
-  .tl-detail{font-size:clamp(12px,3.2vw,15px);padding:14px}
-  .tl-btns{justify-content:center}
-
-  /* Bento (s6 channels) */
-  .ch-grid{grid-template-columns:1fr !important;gap:10px}
-  .ch{padding:14px 16px}
-
-  /* Inner padding */
-  .inner{padding:clamp(16px,4vh,32px) clamp(14px,4vw,24px) !important}
-
-  /* Cursor glow — hide on mobile, no mouse */
-  .glow{display:none !important}
-
-  /* Film grain — lighter on mobile for performance */
-  body::after{opacity:.004}
-
-  /* Mesh — reduce blobs for performance */
-  .mesh__b:nth-child(n+4){display:none}
-}
-
-@media(max-width:400px){
-  /* Very small phones */
-  .hero-t{font-size:clamp(32px,12vw,56px) !important}
-  h2{font-size:clamp(18px,5.5vw,26px) !important}
-  .h-stat__n{font-size:clamp(24px,7vw,36px)}
-  .donut-viz,.orbit-viz{height:clamp(240px,40vh,320px)}
-  .pipe-viz{height:clamp(180px,35vh,260px)}
+  .tl-l{font-size:clamp(7px,1.8vw,9px)}
+  .tl-n{width:20px;height:20px;font-size:9px}
+  .tl-detail{font-size:clamp(12px,3vw,14px);padding:12px}
 }
 
 /* ═══ VIDEO BACKGROUND ═══ */
