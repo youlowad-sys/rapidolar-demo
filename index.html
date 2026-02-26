@@ -395,69 +395,76 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.15);border-radius:2px}
 
 /* ═══════════════════════════════════════════════
-   MOBILE — full phone support
+   MOBILE — phone support (keep horizontal layouts!)
    ═══════════════════════════════════════════════ */
 @media(max-width:900px){
-  /* Sections — remove fixed height, let content flow naturally */
-  .s{height:auto;min-height:100vh;min-height:100dvh;scroll-snap-align:none}
+  /* Sections — auto height, NO overflow clip, NO snap */
+  .s{height:auto;min-height:100vh;min-height:100dvh;overflow:visible;scroll-snap-align:none}
 
-  /* Canvas vizzes — smaller */
-  .pipe-viz{max-width:90%;height:clamp(200px,35vh,280px)}
-  .donut-viz{max-width:90%;height:clamp(260px,38vh,340px)}
-  .orbit-viz{max-width:90%;height:clamp(260px,38vh,340px)}
+  /* Split sections stay as column but both halves visible */
+  .half{padding:clamp(12px,2vh,20px) clamp(12px,3vw,20px)}
 
-  /* Cursor glow — hide on mobile */
+  /* Canvas vizzes — fit mobile */
+  .pipe-viz{max-width:100%;height:clamp(200px,32vh,280px)}
+  .donut-viz{max-width:100%;height:clamp(240px,35vh,320px)}
+  .orbit-viz{max-width:100%;height:clamp(240px,35vh,320px)}
+
+  /* Hide cursor glow + reduce effects */
   .glow{display:none !important}
-
-  /* Performance */
   .mesh__b:nth-child(n+5){display:none}
   body::after{opacity:.003}
 }
 
 @media(max-width:600px){
-  /* Hero */
-  .hero-t{font-size:clamp(36px,13vw,72px) !important}
-  .h-stats{flex-wrap:wrap;gap:14px;margin-top:16px}
-  .h-stat__n{font-size:clamp(28px,7vw,40px)}
-  .h-stat__l{font-size:clamp(9px,2.2vw,11px)}
+  /* Hero — keep stats HORIZONTAL */
+  .hero-t{font-size:clamp(36px,12vw,64px) !important}
+  .h-stats{gap:clamp(10px,3vw,20px);margin-top:14px}
+  .h-stat__n{font-size:clamp(22px,6vw,36px)}
+  .h-stat__l{font-size:clamp(8px,2vw,10px)}
 
-  /* Typography — scale down proportionally */
-  h2{font-size:clamp(20px,5.5vw,30px) !important;line-height:1.15}
-  .desc{font-size:clamp(13px,3.2vw,15px) !important}
+  /* Typography */
+  h2{font-size:clamp(20px,5vw,28px) !important;line-height:1.15}
+  .desc{font-size:clamp(12px,3vw,15px) !important}
   .label{font-size:clamp(9px,2.2vw,11px);letter-spacing:2px}
 
   /* Padding */
-  .inner{padding:clamp(16px,3vh,28px) clamp(14px,3vw,20px) !important}
-  .half{padding:clamp(14px,2.5vh,24px) clamp(12px,3vw,20px)}
+  .inner{padding:clamp(14px,2.5vh,24px) clamp(12px,3vw,18px) !important}
 
-  /* Transaction pipe (s6) */
-  .txn-step{width:clamp(54px,15vw,72px)}
-  .txn-dot{width:26px;height:26px}
-  .txn-lbl{font-size:clamp(7px,1.8vw,9px)}
-  .txn-sub{font-size:7px}
-  .txn-timer{font-size:clamp(22px,6vw,32px)}
-  .txn-metrics{grid-template-columns:1fr;gap:8px}
-  .txn-m{padding:12px 14px}
-  .txn-m__n{font-size:clamp(26px,6.5vw,36px)}
-  .txn-m__d{font-size:clamp(11px,2.8vw,13px)}
+  /* Transaction pipe (s6) — keep HORIZONTAL, just smaller */
+  .txn-step{width:clamp(50px,14vw,70px)}
+  .txn-dot{width:24px;height:24px}
+  .txn-lbl{font-size:clamp(6px,1.6vw,8px)}
+  .txn-sub{font-size:6px}
+  .txn-timer{font-size:clamp(20px,5.5vw,30px)}
 
-  /* ROI calculator */
-  .roi-input{flex-direction:column;align-items:stretch;gap:8px}
-  .roi-input input{width:100%}
-  .roi-m{font-size:clamp(11px,2.8vw,13px)}
-  .roi-card{padding:14px}
+  /* Transaction metrics — keep 3 columns HORIZONTAL */
+  .txn-metrics{gap:6px}
+  .txn-m{padding:10px 8px}
+  .txn-m__n{font-size:clamp(22px,5.5vw,32px)}
+  .txn-m__t{font-size:clamp(7px,1.8vw,9px)}
+  .txn-m__d{font-size:clamp(9px,2.2vw,11px)}
+
+  /* ROI — keep 2 columns HORIZONTAL */
+  .roi-input{gap:8px}
+  .roi-input input{width:100px}
+  .roi-m{font-size:clamp(10px,2.5vw,12px)}
+  .roi-card{padding:12px}
+  .roi-card__tag{font-size:clamp(8px,2vw,10px)}
 
   /* CTA */
-  .cta-btn{padding:14px 28px;font-size:clamp(14px,3.8vw,17px)}
+  .cta-btn{padding:14px 28px;font-size:clamp(14px,3.5vw,16px)}
 
   /* Claims table */
   .cl-wrap{-webkit-overflow-scrolling:touch}
   .cl-t{min-width:480px}
 
-  /* Timeline (s5) */
-  .tl-l{font-size:clamp(7px,1.8vw,9px)}
-  .tl-n{width:20px;height:20px;font-size:9px}
-  .tl-detail{font-size:clamp(12px,3vw,14px);padding:12px}
+  /* Timeline (s5) — keep HORIZONTAL steps */
+  .tl-l{font-size:clamp(7px,1.6vw,9px)}
+  .tl-n{width:18px;height:18px;font-size:8px}
+  .tl-detail{font-size:clamp(11px,2.8vw,14px);padding:10px}
+
+  /* Cinema (s7) */
+  .cine{border-radius:8px}
 }
 
 /* ═══ VIDEO BACKGROUND ═══ */
