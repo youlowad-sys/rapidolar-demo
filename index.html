@@ -2111,9 +2111,25 @@ setTimeout(function(){
 /* ═══ MOBILE CANVAS SAFETY — force resize on orientation/load ═══ */
 function forceCanvasResize(){
   window.dispatchEvent(new Event('resize'));
+  /* Re-trigger IntersectionObserver by scrolling 1px */
+  var y=window.scrollY;
+  window.scrollTo(0,y+1);
+  setTimeout(function(){window.scrollTo(0,y)},50);
 }
-window.addEventListener('orientationchange',function(){setTimeout(forceCanvasResize,300)});
-window.addEventListener('load',function(){setTimeout(forceCanvasResize,500);setTimeout(forceCanvasResize,1500)});
+window.addEventListener('orientationchange',function(){
+  setTimeout(forceCanvasResize,200);
+  setTimeout(forceCanvasResize,600);
+  setTimeout(forceCanvasResize,1200);
+});
+window.addEventListener('load',function(){
+  setTimeout(forceCanvasResize,500);
+  setTimeout(forceCanvasResize,1500);
+});
+/* Also on screen.orientation change (newer API) */
+if(screen.orientation){screen.orientation.addEventListener('change',function(){
+  setTimeout(forceCanvasResize,200);
+  setTimeout(forceCanvasResize,600);
+});}
 </script>
 </body>
 </html>
