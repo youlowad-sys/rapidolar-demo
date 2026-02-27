@@ -536,9 +536,11 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   #s7 .inner{padding:2px 8px !important;display:flex !important;flex-direction:column !important;height:100% !important}
   #s7 h2{font-size:11px !important;margin-bottom:1px !important;line-height:1.1 !important}
   .cine{flex:1 !important;height:auto !important;min-height:0 !important;border-radius:6px !important;margin-top:1px !important}
-  .cine-tabs{display:none !important}
+  .cine-tabs{display:flex !important;gap:0 !important}
+  .cine-tab{padding:4px 6px !important;font-size:7px !important;gap:3px !important;letter-spacing:0 !important}
+  .cine-tab__num{width:12px !important;height:12px !important;font-size:5px !important}
   .cine-stage{min-height:0 !important}
-  .cine-left{flex:0 0 55% !important}
+  .cine-left{flex:0 0 55% !important;transform:scale(0.7) !important;transform-origin:center center !important}
   .cine-right{padding:6px 8px !important;overflow-y:auto !important}
   .ann-icon{width:22px !important;height:22px !important;margin-bottom:3px !important;border-radius:5px !important}
   .ann-icon svg{width:12px !important;height:12px !important}
@@ -807,7 +809,7 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   <div style="position:absolute;bottom:-60px;left:0;right:0;height:120px;background:linear-gradient(to top,transparent,rgba(5,5,8,.4),transparent);pointer-events:none;z-index:0"></div>
   <div class="inner" style="text-align:center;max-width:100%;padding:clamp(16px,2vh,28px) clamp(16px,2vw,32px)">
     <div class="label r">07 · Наблюдаемость</div>
-    <h2 class="r d1" style="margin-bottom:clamp(12px,2vh,24px)">Вся система —<br>один экран.</h2>
+    <h2 class="r d1" style="margin-bottom:clamp(12px,2vh,24px)">Вся система — один экран.</h2>
 
 <style>
 /* ═══════════════════════════════════════════════
