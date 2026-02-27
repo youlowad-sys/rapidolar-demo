@@ -531,16 +531,20 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .txn-m__t{font-size:clamp(8px,1.1vw,12px) !important;color:var(--t1) !important}
   .txn-m__d{font-size:clamp(8px,1.1vw,12px) !important;line-height:1.4 !important;color:var(--t1) !important}
 
+  /* Slide dividers — visible separation between slides */
+  #s7,#s8{border-top:2px solid rgba(0,255,136,.25) !important;box-shadow:inset 0 1px 0 rgba(0,255,136,.1) !important}
+
   /* Cinema (s7) — fit on one landscape screen */
   #s7{height:100vh !important;height:100dvh !important;overflow:hidden !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important}
   #s7 .inner{padding:2px 8px !important;display:flex !important;flex-direction:column !important;height:100% !important}
   #s7 h2{font-size:11px !important;margin-bottom:1px !important;line-height:1.1 !important}
   .cine{flex:1 !important;height:auto !important;min-height:0 !important;border-radius:6px !important;margin-top:1px !important}
   .cine-tabs{display:flex !important;gap:0 !important}
-  .cine-tab{padding:4px 6px !important;font-size:7px !important;gap:3px !important;letter-spacing:0 !important}
-  .cine-tab__num{width:12px !important;height:12px !important;font-size:5px !important}
+  .cine-tab{padding:3px 4px !important;font-size:6px !important;gap:2px !important;letter-spacing:0 !important}
+  .cine-tab__num{width:10px !important;height:10px !important;font-size:5px !important}
+  .cine-tab .tab-label{display:inline !important;font-size:6px !important}
   .cine-stage{min-height:0 !important}
-  .cine-left{flex:0 0 55% !important;transform:scale(0.7) !important;transform-origin:center center !important}
+  .cine-left{flex:0 0 55% !important;transform:scale(0.55) !important;transform-origin:center center !important}
   .cine-right{padding:6px 8px !important;overflow-y:auto !important}
   .ann-icon{width:22px !important;height:22px !important;margin-bottom:3px !important;border-radius:5px !important}
   .ann-icon svg{width:12px !important;height:12px !important}
