@@ -468,6 +468,36 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .glow{display:none !important}
   .mesh__b:nth-child(n+4){display:none}
   body::after{opacity:.002}
+
+  /* S2+S3 portrait: animation between title and body */
+  #s2.s--split > .half,
+  #s3.s--split > .half {
+    display: contents !important;
+  }
+  #s2.s--split, #s3.s--split {
+    padding: 0 clamp(10px,3vw,16px) !important;
+  }
+
+  /* S2: label → h2 → pipe → desc */
+  #s2 .label { order: 1 !important; }
+  #s2 h2 { order: 2 !important; }
+  #s2 .pipe-viz { order: 3 !important; width: 100% !important; height: clamp(220px,55vw,300px) !important; }
+  #s2 .desc { order: 4 !important; }
+
+  /* S3: label → h2 → first desc → donut → rest */
+  #s3 .label { order: 1 !important; }
+  #s3 h2 { order: 2 !important; }
+  #s3 .desc.d2 { order: 3 !important; }
+  #s3 .donut-viz { order: 4 !important; width: 100% !important; height: clamp(220px,55vw,300px) !important; }
+  #s3 .desc.d3, #s3 .desc.d4 { order: 5 !important; }
+  #s3 ul { order: 5 !important; }
+  #s3 blockquote { order: 6 !important; }
+
+  /* S3 smaller text */
+  #s3 h2 { font-size: clamp(16px,4.5vw,22px) !important; }
+  #s3 .desc { font-size: clamp(11px,2.8vw,14px) !important; }
+  #s3 ul { font-size: clamp(10px,2.5vw,12px) !important; }
+  #s3 blockquote { font-size: clamp(12px,3vw,15px) !important; padding: 10px 0 10px 14px !important; }
 }
 
 /* ═══════════════════════════════════════════════
