@@ -487,8 +487,9 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .inner{padding:6px 12px !important}
   h2{font-size:clamp(14px,2.5vw,22px) !important;margin-bottom:3px !important}
   .desc{font-size:clamp(9px,1.1vw,13px) !important;line-height:1.4 !important}
-  /* .label (green slide number) — SAME size on ALL slides */
+  /* .label (green slide number) — SAME size on ALL slides, explicit per-slide */
   .label{font-size:clamp(7px,.7vw,9px) !important;margin-bottom:3px !important}
+  #s1 .label,#s2 .label,#s3 .label,#s4 .label,#s5 .label,#s6 .label,#s7 .label,#s8 .label,#s9 .label{font-size:clamp(7px,.7vw,9px) !important}
 
   /* Slide 3 — smaller to fit on 1 screen */
   #s3 h2{font-size:clamp(13px,2.5vw,20px) !important;margin-bottom:3px !important;line-height:1.12 !important}
@@ -521,11 +522,11 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .txn-dot{width:18px !important;height:18px !important}
   .txn-lbl{font-size:clamp(5px,.6vw,7px) !important}
   .txn-sub{font-size:4px !important}
-  .txn-metrics{gap:6px !important}
-  .txn-m{padding:6px 8px !important}
-  .txn-m__n{font-size:clamp(16px,2.5vw,24px) !important}
-  .txn-m__t{font-size:clamp(7px,.9vw,10px) !important;color:var(--t2) !important}
-  .txn-m__d{font-size:clamp(7px,.9vw,10px) !important;line-height:1.35 !important;color:var(--t1) !important}
+  .txn-metrics{gap:8px !important}
+  .txn-m{padding:8px 12px !important}
+  .txn-m__n{font-size:clamp(12px,1.8vw,18px) !important}
+  .txn-m__t{font-size:clamp(8px,1.1vw,12px) !important;color:var(--t1) !important}
+  .txn-m__d{font-size:clamp(8px,1.1vw,12px) !important;line-height:1.4 !important;color:var(--t1) !important}
 
   /* Cinema (s7) */
   .cine{height:80vh !important}
