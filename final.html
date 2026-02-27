@@ -1,0 +1,2240 @@
+<!DOCTYPE html>
+<html lang="ru" class="no-js">
+<head>
+<script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js')</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>RAPIDOLAR — Tech Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   ROOT & VARIABLES
+   ═══════════════════════════════════════════════ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-moz-text-size-adjust:100%;text-size-adjust:100%}
+:root{
+  --bg:#050508;--bg2:#0a0a0f;--bg3:#111118;
+  --t1:#f0f0f5;--t2:#a0a0b0;--t3:#8888a0;--t4:#5c5c72;
+  --g:#00ff88;--g2:#10b981;--g-dim:rgba(0,255,136,.06);--g-glow:rgba(0,255,136,.3);
+  --cy:#06b6d4;--cy-glow:rgba(6,182,212,.25);
+  --rd:#ff4466;--am:#ffaa00;--bl:#4488ff;--pu:#7c5cff;
+  --brd:rgba(255,255,255,.06);--brd-l:rgba(255,255,255,.1);
+  --sans:'Inter',system-ui,sans-serif;--display:'Space Grotesk','Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+html,body{height:100%;overflow-x:hidden}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--t2);-webkit-font-smoothing:antialiased}
+::selection{background:var(--g);color:#000}
+
+/* ═══════════════════════════════════════════════
+   MESH GRADIENT BACKGROUND — parallax via JS
+   ═══════════════════════════════════════════════ */
+.mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.mesh__b{position:absolute;border-radius:50%;filter:blur(clamp(60px,12vw,120px));will-change:transform;animation-timing-function:ease-in-out;animation-iteration-count:infinite;animation-direction:alternate}
+.mesh__b:nth-child(1){width:45vw;height:45vw;background:rgba(0,255,136,.09);top:5%;left:10%;animation:m1 25s infinite alternate}
+.mesh__b:nth-child(2){width:40vw;height:40vw;background:rgba(6,182,212,.07);top:55%;right:5%;animation:m2 30s infinite alternate}
+.mesh__b:nth-child(3){width:50vw;height:50vw;background:rgba(124,92,255,.05);bottom:0;left:35%;animation:m3 35s infinite alternate}
+.mesh__b:nth-child(4){width:30vw;height:30vw;background:rgba(0,255,136,.05);top:40%;left:60%;animation:m4 20s infinite alternate}
+.mesh__b:nth-child(5){width:35vw;height:35vw;background:rgba(6,182,212,.04);top:20%;right:25%;animation:m2 22s infinite alternate-reverse}
+.mesh__b:nth-child(6){width:25vw;height:25vw;background:rgba(0,255,136,.03);bottom:15%;left:10%;animation:m4 28s infinite alternate-reverse}
+
+/* ═══ GRID OVERLAY — command-center lines ═══ */
+.mesh::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,255,136,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.018) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:1;opacity:.6}
+
+/* ═══ HORIZONTAL SWEEP — scanning light bar ═══ */
+.mesh::after{content:'';position:fixed;left:0;right:0;top:0;height:300px;background:linear-gradient(180deg,transparent 0%,rgba(0,255,136,.012) 40%,rgba(6,182,212,.008) 60%,transparent 100%);pointer-events:none;z-index:1;animation:meshSweep 15s linear infinite;will-change:transform}
+@keyframes meshSweep{0%{transform:translateY(-300px)}100%{transform:translateY(calc(100vh + 300px))}}
+@keyframes m1{0%{transform:translate(0,0) scale(1)}50%{transform:translate(8vw,5vh) scale(1.15)}100%{transform:translate(-3vw,12vh) scale(.9)}}
+@keyframes m2{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-6vw,-4vh) scale(1.1)}100%{transform:translate(4vw,-8vh) scale(.95)}}
+@keyframes m3{0%{transform:translate(0,0) scale(1)}50%{transform:translate(5vw,-6vh) scale(1.2)}100%{transform:translate(-8vw,3vh) scale(.85)}}
+@keyframes m4{0%{transform:translate(0,0) scale(1)}50%{transform:translate(-4vw,6vh) scale(1.3)}100%{transform:translate(6vw,-5vh) scale(.9)}}
+
+/* ═══════════════════════════════════════════════
+   CURSOR GLOW — smoothed via lerp
+   ═══════════════════════════════════════════════ */
+.glow{position:fixed;width:700px;height:700px;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(0,255,136,.06) 0%,rgba(6,182,212,.02) 40%,transparent 70%);transform:translate(-50%,-50%);opacity:0;will-change:left,top}
+.glow.active{opacity:1;transition:opacity .3s}
+
+/* ═══════════════════════════════════════════════
+   FILM GRAIN
+   ═══════════════════════════════════════════════ */
+body::after{content:'';position:fixed;inset:0;z-index:9998;pointer-events:none;opacity:.008;background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+/* ═══════════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════════ */
+#pbar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--g),var(--cy),var(--pu));box-shadow:0 0 20px var(--g-glow);z-index:300;transform-origin:left;transform:scaleX(0);width:100%;transition:transform .08s linear}
+
+/* ═══════════════════════════════════════════════
+   NAV DOTS
+   ═══════════════════════════════════════════════ */
+.nav{position:fixed;right:clamp(12px,2vw,28px);top:50%;transform:translateY(-50%);z-index:200;display:flex;flex-direction:column;gap:clamp(10px,1.5vh,14px)}
+.nav__d{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.12);border:none;cursor:pointer;transition:all .3s var(--ease);position:relative;padding:0}
+.nav__d.on{background:var(--g);box-shadow:0 0 10px var(--g-glow);transform:scale(1.3)}
+.nav__d::after{content:attr(data-l);position:absolute;right:20px;top:50%;transform:translateY(-50%);font-size:10px;font-family:var(--mono);color:var(--t4);white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s var(--ease);transform:translateY(-50%) translateX(4px)}
+.nav__d:hover::after{opacity:1;transform:translateY(-50%) translateX(0)}
+@media(max-width:700px){.nav{display:none}}
+
+/* ═══════════════════════════════════════════════
+   SECTIONS
+   ═══════════════════════════════════════════════ */
+.s{width:100vw;height:100vh;height:100dvh;scroll-snap-align:start;position:relative;display:flex;overflow:hidden}
+.s--col{flex-direction:column;align-items:center;justify-content:center}
+.s--split{flex-direction:row;align-items:center}
+.s--free{height:auto;min-height:60vh;overflow:visible;scroll-snap-align:none}
+
+/* ═══════════════════════════════════════════════
+   VIDEO BACKGROUND
+   ═══════════════════════════════════════════════ */
+.vid-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.vid-bg video{width:100%;height:100%;object-fit:cover;opacity:.2;filter:saturate(.7)}
+.vid-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 20%,transparent 80%,var(--bg) 100%)}
+
+/* ═══════════════════════════════════════════════
+   SKELETON SHIMMER (for lazy-loaded media)
+   ═══════════════════════════════════════════════ */
+.shimmer{position:relative;overflow:hidden}
+.shimmer::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.03) 50%,transparent 100%);background-size:200% 100%;animation:shimmerAnim 1.5s ease-in-out infinite}
+@keyframes shimmerAnim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.shimmer.loaded::after{display:none}
+
+/* ═══════════════════════════════════════════════
+   CONTENT
+   ═══════════════════════════════════════════════ */
+.inner{position:relative;z-index:5;width:100%;max-width:1200px;margin:0 auto;padding:clamp(24px,4vh,48px) clamp(20px,4vw,48px)}
+.half{flex:1;padding:clamp(24px,4vh,48px) clamp(20px,4vw,40px);display:flex;flex-direction:column;justify-content:center;position:relative;z-index:5}
+
+/* ═══════════════════════════════════════════════
+   TYPOGRAPHY
+   ═══════════════════════════════════════════════ */
+.label{font-size:clamp(11px,1vw,14px);font-weight:500;text-transform:uppercase;letter-spacing:4px;color:var(--g);margin-bottom:clamp(12px,2vh,20px);font-family:var(--mono);text-shadow:0 0 20px var(--g-glow)}
+@media(max-width:1400px){.label{font-size:8px !important;letter-spacing:1px !important;margin-bottom:4px !important}}
+.hero-t{font-family:var(--display);font-size:clamp(56px,11vw,160px);font-weight:700;line-height:.82;letter-spacing:-.05em;color:var(--t1);margin-bottom:clamp(16px,3vh,32px);user-select:none;position:relative;text-shadow:0 0 60px rgba(0,255,136,.08)}
+h2{font-family:var(--display);font-size:clamp(30px,4.8vw,60px);font-weight:600;color:var(--t1);line-height:1.08;letter-spacing:-.03em;margin-bottom:clamp(12px,2vh,20px);text-wrap:balance;text-shadow:0 0 40px rgba(0,255,136,.06)}
+h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;color:var(--t1);margin-bottom:10px}
+.desc{font-size:clamp(15px,1.4vw,20px);color:var(--t2);max-width:55ch;line-height:1.75}
+
+/* ═══════════════════════════════════════════════
+   REVEAL — blur + scale + translateY
+   ═══════════════════════════════════════════════ */
+/* Without JS — everything visible. With JS — reveal via IntersectionObserver */
+.r{opacity:1;transform:none;filter:none}
+.js .r{opacity:0;transform:translateY(clamp(12px,2vh,24px)) scale(.97);filter:blur(4px);transition:opacity .7s var(--ease),transform .7s var(--ease),filter .7s var(--ease)}
+.js .r.v{opacity:1;transform:none;filter:none}
+.js .r.d1{transition-delay:.12s}.js .r.d2{transition-delay:.24s}.js .r.d3{transition-delay:.38s}.js .r.d4{transition-delay:.52s}
+
+/* ═══════════════════════════════════════════════
+   HERO STATS
+   ═══════════════════════════════════════════════ */
+.h-stats{display:flex;gap:clamp(24px,4vw,56px);margin-top:clamp(24px,4vh,48px)}
+.h-stat{text-align:left}
+.h-stat__n{font-size:clamp(36px,4.5vw,64px);font-weight:800;font-family:var(--mono);color:var(--t1);line-height:1}
+.h-stat__n .acc{color:var(--g);text-shadow:0 0 30px var(--g-glow)}
+.h-stat__l{font-size:clamp(11px,.9vw,13px);color:var(--t3);margin-top:6px;letter-spacing:1px;text-transform:uppercase;font-family:var(--mono)}
+
+/* ═══ SECTION EDGE GLOW — bottom gradient on each section ═══ */
+.s::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.08),rgba(6,182,212,.06),transparent);pointer-events:none;z-index:6}
+.s--free::after{display:none}
+
+/* ═══════════════════════════════════════════════
+   SCROLL CUE (animated)
+   ═══════════════════════════════════════════════ */
+.cue{position:absolute;bottom:clamp(20px,3vh,36px);left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.25;animation:cue 2.5s ease-in-out infinite}
+.cue span{display:block;width:1px;height:clamp(20px,3vh,32px);background:linear-gradient(var(--g),transparent)}
+.cue small{font-size:9px;font-family:var(--mono);color:var(--t4);letter-spacing:2px;text-transform:uppercase}
+@keyframes cue{0%,100%{transform:translateX(-50%) translateY(0);opacity:.25}50%{transform:translateX(-50%) translateY(6px);opacity:.1}}
+
+/* ═══════════════════════════════════════════════
+   SIGNAL FLOW — animated data packets
+   ═══════════════════════════════════════════════ */
+.signal{width:100%;max-width:400px;height:clamp(180px,30vh,280px);position:relative}
+.signal__line{position:absolute;left:50%;width:2px;top:0;bottom:0;background:linear-gradient(to bottom,var(--g),rgba(0,255,136,.1));opacity:.3}
+.signal__packet{position:absolute;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 12px var(--g-glow);animation:pkt 2.5s ease-in-out infinite}
+.signal__packet:nth-child(3){animation-delay:.8s}.signal__packet:nth-child(4){animation-delay:1.6s}
+.signal__node{position:absolute;left:50%;transform:translateX(-50%);background:var(--bg3);border:1px solid var(--brd-l);border-radius:8px;padding:6px 14px;font-family:var(--mono);font-size:clamp(10px,.75vw,12px);color:var(--t3);white-space:nowrap}
+.signal__node:nth-of-type(1){top:0}.signal__node:nth-of-type(2){top:35%}.signal__node:nth-of-type(3){top:70%}
+.signal__node .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--g);margin-right:6px;animation:blink 1.5s ease infinite}
+@keyframes pkt{0%{top:8%;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:85%;opacity:0}}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+
+/* ═══════════════════════════════════════════════
+   DEVICE MOCKUP (for GIFs) — upgraded
+   ═══════════════════════════════════════════════ */
+.device{position:relative;max-width:clamp(200px,30vw,320px);border-radius:clamp(12px,1.5vw,20px);overflow:hidden;border:2px solid rgba(255,255,255,.08);background:var(--bg2);box-shadow:0 20px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.03) inset;transition:all .4s var(--ease)}
+.device:hover{border-color:rgba(0,255,136,.15);box-shadow:0 24px 70px rgba(0,0,0,.7),0 0 40px rgba(0,255,136,.06)}
+.device__bar{display:flex;align-items:center;gap:5px;padding:8px 12px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd)}
+.device__dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.08)}
+.device__url{margin-left:8px;font-family:var(--mono);font-size:9px;color:var(--t4)}
+.device img{width:100%;display:block}
+.device__badge{position:absolute;top:32px;right:8px;background:var(--g);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:1px;z-index:3}
+
+/* ═══════════════════════════════════════════════
+   ANIMATED GRADIENT BORDER
+   ═══════════════════════════════════════════════ */
+.anim-border{position:relative}
+.anim-border::before{content:'';position:absolute;inset:-1px;border-radius:inherit;padding:1px;background:linear-gradient(135deg,var(--g),var(--cy),var(--pu),var(--g));background-size:300% 300%;animation:borderShift 4s linear infinite;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .4s}
+.anim-border:hover::before{opacity:1}
+@keyframes borderShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* ═══════════════════════════════════════════════
+   BENTO GRID — 3D tilt
+   ═══════════════════════════════════════════════ */
+.bento{display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);gap:clamp(6px,1vw,12px);width:100%;max-height:min(65vh,560px);overflow:hidden}
+.bento__i{border-radius:clamp(8px,1vw,14px);overflow:hidden;border:1px solid var(--brd);background:var(--bg2);cursor:pointer;transition:all .3s var(--ease);position:relative;transform-style:preserve-3d}
+.bento__i:hover{border-color:rgba(0,255,136,.15);z-index:2;box-shadow:0 16px 48px rgba(0,0,0,.5),0 0 30px rgba(0,255,136,.05)}
+.bento__i img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block;transition:transform .4s var(--ease)}
+.bento__i:hover img{transform:scale(1.03)}
+.bento__i--lg{grid-column:span 2}
+.bento__l{position:absolute;bottom:0;left:0;right:0;padding:8px 12px;background:linear-gradient(transparent,rgba(5,5,8,.95));font-family:var(--mono);font-size:clamp(9px,.7vw,11px);color:var(--t3);opacity:0;transition:opacity .3s}
+.bento__i:hover .bento__l{opacity:1}
+.bento__gif{position:absolute;top:6px;right:6px;background:var(--g);color:#000;font-family:var(--mono);font-size:8px;font-weight:700;padding:2px 6px;border-radius:3px;letter-spacing:1px;z-index:3}
+@media(max-width:700px){.bento{grid-template-columns:1fr 1fr}.bento__i--lg{grid-column:span 2}}
+@media(max-width:480px){.bento{grid-template-columns:1fr}.bento__i--lg{grid-column:span 1}}
+
+/* ═══════════════════════════════════════════════
+   TERMINAL
+   ═══════════════════════════════════════════════ */
+.term{background:var(--bg);border:1px solid var(--brd-l);border-radius:clamp(10px,1.2vw,16px);overflow:hidden;width:100%;max-width:900px;position:relative}
+.term::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,.006) 2px,rgba(255,255,255,.006) 4px);pointer-events:none;z-index:1}
+.term__bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:rgba(255,255,255,.02);border-bottom:1px solid var(--brd)}
+.term__dot{width:10px;height:10px;border-radius:50%}
+.term__dot--r{background:#ff5f57}.term__dot--y{background:#febc2e}.term__dot--g{background:#28c840}
+.term__title{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--t4)}
+.term__body{padding:clamp(14px,2vw,24px);position:relative;z-index:2}
+.tn{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(6px,1vw,10px);margin:10px 0}
+@media(max-width:600px){.tn{grid-template-columns:repeat(2,1fr)}}
+.tnn{background:rgba(255,255,255,.02);border:1px solid var(--brd);border-radius:8px;padding:clamp(8px,1vw,14px);text-align:center;transition:all .3s}
+.tnn__nm{font-family:var(--mono);font-size:clamp(11px,.8vw,13px);font-weight:600;color:var(--t1);margin-bottom:4px}
+.tnn__bar{height:4px;background:rgba(255,255,255,.04);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.tnn__fill{height:100%;border-radius:2px;transition:width .5s,background .3s}
+.tnn__st{font-size:clamp(9px,.7vw,10px);font-weight:600;text-transform:uppercase;letter-spacing:1px}
+.tnn--ok{border-color:rgba(0,255,136,.15)}.tnn--ok .tnn__fill{background:var(--g)}.tnn--ok .tnn__st{color:var(--g)}
+.tnn--fail{border-color:var(--rd)}.tnn--fail .tnn__fill{background:var(--rd)}.tnn--fail .tnn__st{color:var(--rd)}
+.tnn--cb{border-color:var(--am)}.tnn--cb .tnn__fill{background:var(--am)}.tnn--cb .tnn__st{color:var(--am)}
+.tnn--stop{border-color:var(--t4)}.tnn--stop .tnn__fill{background:var(--t4)}.tnn--stop .tnn__st{color:var(--t4)}
+.t-status{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:clamp(11px,.8vw,13px);font-weight:600;margin-bottom:8px}
+.t-status::before{content:'●';font-size:8px}
+.t-status--ok{color:var(--g)}.t-status--deg{color:var(--am)}.t-status--stop{color:var(--rd)}
+.t-btns{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.t-btn{padding:clamp(5px,.7vh,8px) clamp(10px,1.2vw,16px);border:1px solid var(--brd);background:transparent;color:var(--t3);border-radius:6px;cursor:pointer;font-size:clamp(11px,.8vw,13px);font-family:var(--mono);transition:all .15s;position:relative;overflow:hidden}
+.t-btn:hover{background:rgba(255,255,255,.04);color:var(--t1)}
+.t-btn--d{border-color:rgba(255,68,102,.2);color:var(--rd)}.t-btn--d:hover{background:rgba(255,68,102,.06)}
+.t-btn--r{border-color:rgba(0,255,136,.15);color:var(--g)}.t-btn--r:hover{background:var(--g-dim)}
+/* Ripple effect on buttons */
+.t-btn .ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.12);transform:scale(0);animation:rippleAnim .6s ease-out forwards;pointer-events:none}
+@keyframes rippleAnim{to{transform:scale(4);opacity:0}}
+.t-log{background:rgba(0,0,0,.5);border-radius:6px;padding:clamp(8px,1vw,12px);max-height:clamp(80px,12vh,130px);overflow-y:auto;margin-top:8px;font-family:var(--mono);font-size:clamp(10px,.75vw,12px);line-height:1.8;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.08) transparent}
+.t-log::-webkit-scrollbar{width:2px}.t-log::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:1px}
+.le{color:var(--t3)}.le .tm{color:var(--t4)}.le .ok{color:var(--g)}.le .wr{color:var(--am)}.le .fl{color:var(--rd)}
+
+/* ═══════════════════════════════════════════════
+   SIMULATOR
+   ═══════════════════════════════════════════════ */
+.sim{width:100%;max-width:440px}
+.sim-row{display:flex;align-items:center;gap:clamp(8px,1vw,12px);margin-bottom:clamp(8px,1.2vh,14px)}
+.sim-row label{font-size:clamp(12px,.9vw,14px);color:var(--t3);width:clamp(70px,8vw,100px);flex-shrink:0}
+.sim-row input[type=range]{flex:1;-webkit-appearance:none;height:3px;border-radius:2px;background:rgba(255,255,255,.08);outline:none;cursor:pointer}
+.sim-row input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--g-glow);cursor:pointer;transition:transform .15s}
+.sim-row input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.3)}
+.sim-row input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--g);border:none}
+.sim-v{font-family:var(--mono);font-size:clamp(11px,.8vw,13px);color:var(--g);width:36px;text-align:right;flex-shrink:0}
+.sw{display:flex;align-items:center;gap:8px;padding:clamp(5px,.7vh,8px) 0;border-bottom:1px solid rgba(255,255,255,.03)}
+.sw:last-child{border-bottom:none}
+.sw__nm{font-size:clamp(11px,.8vw,13px);font-weight:600;color:var(--t2);width:70px;font-family:var(--mono)}
+.sw__bar{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.sw__fill{height:100%;background:var(--g);border-radius:3px;transition:width .4s var(--ease)}
+.sw__sc{font-family:var(--mono);font-size:clamp(11px,.8vw,13px);color:var(--t3);width:40px;text-align:right}
+.sw--top .sw__nm{color:var(--g)}.sw--top .sw__fill{box-shadow:0 0 12px var(--g-glow)}
+
+/* ═══════════════════════════════════════════════
+   TIMELINE
+   ═══════════════════════════════════════════════ */
+.tl-wrap{width:100%;max-width:900px;margin:0 auto}
+.tl-steps{display:flex;width:100%;position:relative;margin:clamp(12px,2vh,20px) 0}
+.tl-s{flex:1;text-align:center;cursor:pointer;padding:clamp(6px,1vh,12px) 4px;position:relative;transition:all .2s}
+.tl-s:hover{background:rgba(255,255,255,.01);border-radius:8px}
+.tl-s+.tl-s::before{content:'';position:absolute;top:clamp(17px,2vh,21px);right:50%;width:100%;height:2px;background:rgba(255,255,255,.06);transition:background .4s var(--ease)}
+.tl-s.done+.tl-s::before,.tl-s.on+.tl-s::before{background:var(--g)}
+.tl-n{width:clamp(22px,2.5vh,28px);height:clamp(22px,2.5vh,28px);border-radius:50%;background:var(--bg2);border:2px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:clamp(10px,.7vw,12px);font-weight:700;color:var(--t4);margin:0 auto clamp(4px,.5vh,8px);position:relative;z-index:1;transition:all .3s}
+.tl-s.on .tl-n{background:var(--g);border-color:var(--g);color:#000;box-shadow:0 0 16px var(--g-glow)}
+.tl-s.done .tl-n{background:var(--g-dim);border-color:rgba(0,255,136,.3);color:var(--g)}
+.tl-l{font-size:clamp(9px,.7vw,11px);color:var(--t4)}.tl-s.on .tl-l{color:var(--t1);font-weight:600}
+.tl-detail{padding:clamp(16px,2vh,26px);background:rgba(255,255,255,.02);border-radius:12px;font-size:clamp(14px,1.1vw,17px);line-height:1.8;color:var(--t2);border:1px solid var(--brd);margin-top:8px;transition:all .3s var(--ease)}
+.tl-btns{display:flex;gap:6px;margin-top:clamp(6px,1vh,12px)}
+.tl-btn{padding:clamp(5px,.7vh,8px) 16px;border:1px solid var(--brd);background:transparent;color:var(--t3);border-radius:6px;cursor:pointer;font-size:13px;font-family:var(--sans);transition:all .15s}
+.tl-btn:hover{background:rgba(255,255,255,.04);color:var(--t1)}
+
+/* ═══════════════════════════════════════════════
+   CHANNELS / RESULT CARDS
+   ═══════════════════════════════════════════════ */
+.ch-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(10px,1.5vw,20px);width:100%;max-width:760px;margin:0 auto}
+@media(max-width:700px){.ch-grid{grid-template-columns:1fr}}
+.ch{background:rgba(255,255,255,.02);border:1px solid var(--brd);border-radius:clamp(12px,1.5vw,18px);padding:clamp(18px,2.5vh,32px) clamp(14px,1.8vw,24px);text-align:center;position:relative;overflow:hidden;transition:all .4s var(--ease)}
+.ch::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;border-radius:1px}
+.ch--1::before{background:var(--cy)}.ch--2::before{background:var(--g)}.ch--3::before{background:var(--bl)}
+.ch:hover{transform:translateY(-6px);border-color:rgba(0,255,136,.12);box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 40px rgba(0,255,136,.04)}
+.ch__icon{font-size:clamp(22px,3vw,32px);margin-bottom:clamp(10px,1.2vh,16px)}
+.ch__title{font-family:var(--display);font-size:clamp(14px,1.1vw,16px);font-weight:600;color:var(--t1);margin-bottom:clamp(4px,.5vh,8px)}
+.ch__desc{font-size:clamp(11px,.85vw,13px);color:var(--t3);line-height:1.5}
+
+/* ═══════════════════════════════════════════════
+   ROI
+   ═══════════════════════════════════════════════ */
+.roi-wrap{width:100%;max-width:800px;margin:0 auto}
+.roi-input{display:flex;align-items:center;gap:12px;margin:clamp(12px,2vh,20px) 0}
+.roi-input label{font-size:clamp(13px,1vw,15px);color:var(--t3)}
+.roi-input input{background:var(--bg);border:1px solid var(--brd-l);color:var(--t1);font-family:var(--mono);font-size:clamp(16px,1.3vw,20px);padding:clamp(8px,1vh,12px) 14px;border-radius:10px;width:140px;outline:none;transition:border .2s,box-shadow .2s}
+.roi-input input:focus{border-color:var(--g);box-shadow:0 0 0 3px var(--g-dim)}
+.roi-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,1.5vw,18px)}
+@media(max-width:600px){.roi-grid{grid-template-columns:1fr}}
+.roi-card{padding:clamp(20px,2.5vh,30px);border-radius:14px;transition:all .35s var(--ease)}
+.roi-card:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.roi-card--b{background:rgba(255,68,102,.04);border:1px solid rgba(255,68,102,.1)}
+.roi-card--a{background:var(--g-dim);border:1px solid rgba(0,255,136,.12)}
+.roi-card__tag{font-size:clamp(9px,.7vw,11px);font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:clamp(8px,1vh,14px);font-family:var(--mono)}
+.roi-card--b .roi-card__tag{color:var(--rd)}.roi-card--a .roi-card__tag{color:var(--g)}
+.roi-m{display:flex;justify-content:space-between;padding:clamp(4px,.5vh,7px) 0;font-size:clamp(12px,.9vw,14px)}
+.roi-m__l{color:var(--t3)}.roi-m__v{font-family:var(--mono);font-weight:600;color:var(--t1)}
+
+/* ═══════════════════════════════════════════════
+   CTA — MAGNETIC BUTTON
+   ═══════════════════════════════════════════════ */
+.cta-wrap{position:relative;display:inline-block}
+.cta-btn{display:inline-block;padding:clamp(16px,2vh,22px) clamp(40px,5.5vw,64px);background:var(--g);color:#000;font-size:clamp(15px,1.2vw,18px);font-weight:700;font-family:var(--display);border-radius:14px;text-decoration:none;transition:all .25s var(--ease);border:none;cursor:pointer;position:relative;z-index:2}
+.cta-btn:hover{background:#33ffaa;box-shadow:0 20px 60px var(--g-glow)}
+.cta-glow{position:absolute;inset:-40px;border-radius:50%;background:radial-gradient(circle,rgba(0,255,136,.12) 0%,transparent 70%);z-index:1;opacity:0;transition:opacity .4s}
+.cta-wrap:hover .cta-glow{opacity:1}
+
+/* ═══════════════════════════════════════════════
+   CLAIMS TABLE
+   ═══════════════════════════════════════════════ */
+.cl-wrap{overflow-x:auto}
+.cl-t{width:100%;border-collapse:collapse;font-size:clamp(11px,.85vw,13px)}
+.cl-t th{text-align:left;padding:clamp(6px,.8vh,10px) 10px;border-bottom:1px solid var(--brd-l);color:var(--t1);font-weight:600;font-size:clamp(9px,.7vw,11px);text-transform:uppercase;letter-spacing:1px;font-family:var(--mono)}
+.cl-t td{padding:clamp(6px,.8vh,10px) 10px;border-bottom:1px solid var(--brd);color:var(--t3)}
+.cl-t tr:hover td{background:rgba(255,255,255,.01)}
+.cl-t code{font-family:var(--mono);font-size:clamp(9px,.7vw,11px);color:var(--g);background:rgba(0,255,136,.04);padding:1px 5px;border-radius:3px}
+
+/* ═══════════════════════════════════════════════
+   LIGHTBOX — upgraded with blur + scale
+   ═══════════════════════════════════════════════ */
+.lb{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;cursor:zoom-out;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);opacity:0;pointer-events:none;transition:opacity .3s var(--ease)}
+.lb.open{opacity:1;pointer-events:auto}
+.lb img{max-width:95vw;max-height:93vh;object-fit:contain;border-radius:8px;transform:scale(.92);transition:transform .4s var(--ease);box-shadow:0 40px 120px rgba(0,0,0,.8)}
+.lb.open img{transform:scale(1)}
+.lb__close{position:absolute;top:20px;right:24px;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:var(--t3);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.lb__close:hover{background:rgba(255,255,255,.1);color:var(--t1)}
+
+/* ═══════════════════════════════════════════════
+   PIPE VISUALIZATION (Section 2) — transaction waterfall
+   ═══════════════════════════════════════════════ */
+.pipe-viz{width:100%;max-width:420px;height:clamp(280px,45vh,420px);position:relative;border-radius:16px;background:rgba(255,255,255,.01);border:1px solid var(--brd);overflow:hidden}
+.pipe-viz canvas{position:absolute;inset:0;width:100%;height:100%}
+.pipe-zone{position:absolute;left:14px;font-family:var(--mono);font-size:clamp(9px,.7vw,11px);letter-spacing:1.5px;text-transform:uppercase;pointer-events:none}
+.pipe-zone--1{top:6%;color:var(--g)}
+.pipe-zone--2{top:38%;color:var(--am)}
+.pipe-zone--3{top:70%;color:var(--rd)}
+.pipe-stats{position:absolute;right:14px;bottom:10px;display:flex;flex-direction:column;gap:4px;pointer-events:none}
+.pipe-stat{font-family:var(--mono);font-size:clamp(10px,.75vw,12px);text-align:right;line-height:1.3}
+.pipe-stat--ok{color:var(--g)}.pipe-stat--err{color:var(--rd)}.pipe-stat--dis{color:var(--am)}.pipe-stat--del{color:var(--t4)}
+.pipe-stat span{font-weight:700}
+
+/* ═══════════════════════════════════════════════
+   DONUT CHART (Section 3)
+   ═══════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   TRANSACTION FLOW (Section 6)
+   ═══════════════════════════════════════════════ */
+.txn-flow{margin:clamp(16px,3vh,32px) 0 clamp(20px,3vh,36px);position:relative}
+.txn-pipe{display:flex;align-items:flex-start;justify-content:center;gap:0;position:relative}
+.txn-step{display:flex;flex-direction:column;align-items:center;width:clamp(70px,9vw,110px);position:relative;z-index:1}
+.txn-dot{width:clamp(32px,3.5vw,44px);height:clamp(32px,3.5vw,44px);border-radius:50%;border:2px solid rgba(255,255,255,.1);background:rgba(255,255,255,.02);display:flex;align-items:center;justify-content:center;transition:all .5s cubic-bezier(.4,0,.2,1);position:relative}
+.txn-step.on .txn-dot{border-color:var(--g);background:rgba(0,255,136,.12);box-shadow:0 0 20px rgba(0,255,136,.25)}
+.txn-step.done .txn-dot{border-color:var(--g);background:rgba(0,255,136,.2)}
+.txn-step.on .txn-dot::after,.txn-step.done .txn-dot::after{content:'\2713';color:var(--g);font-size:clamp(14px,1.5vw,18px);font-weight:700}
+.txn-lbl{margin-top:8px;font-family:var(--mono);font-size:clamp(9px,.75vw,11px);letter-spacing:1px;text-transform:uppercase;color:var(--t4);transition:color .4s}
+.txn-step.on .txn-lbl,.txn-step.done .txn-lbl{color:var(--g)}
+.txn-sub{font-size:clamp(8px,.6vw,10px);color:var(--t4);margin-top:2px;opacity:0;transition:opacity .4s}
+.txn-step.on .txn-sub{opacity:1;color:var(--t3)}
+.txn-line{flex:1;height:2px;background:rgba(255,255,255,.06);align-self:center;margin:0 -2px;margin-top:clamp(16px,1.75vw,22px);position:relative;overflow:hidden}
+.txn-line.done{background:var(--g)}
+.txn-pulse{position:absolute;top:-1px;left:0;width:30px;height:4px;background:linear-gradient(90deg,transparent,var(--g),transparent);border-radius:2px;opacity:0;transition:none}
+.txn-line.anim .txn-pulse{opacity:1;animation:txnPulse .6s ease-out forwards}
+@keyframes txnPulse{0%{left:-30px}100%{left:calc(100% + 30px)}}
+.txn-timer{font-family:var(--mono);font-size:clamp(28px,3.5vw,42px);font-weight:700;color:var(--g);margin-top:clamp(12px,2vh,20px);letter-spacing:-1px;opacity:.3;transition:opacity .4s}
+.txn-timer.active{opacity:1}
+.txn-timer.done{color:var(--g);text-shadow:0 0 20px rgba(0,255,136,.3)}
+
+.txn-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(12px,2vw,24px);margin-top:clamp(8px,1.5vh,16px)}
+.txn-m{text-align:center;padding:clamp(18px,2.5vh,28px) clamp(12px,1.8vw,24px);border-radius:14px;background:rgba(255,255,255,.02);border:1px solid var(--brd);transition:all .35s var(--ease)}
+.txn-m:hover{border-color:rgba(0,255,136,.1);box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 24px rgba(0,255,136,.03);transform:translateY(-3px)}
+.txn-m__n{font-size:clamp(32px,3.5vw,48px);font-weight:700;font-family:'Space Grotesk',sans-serif;line-height:1.1}
+.txn-m__t{font-family:var(--mono);font-size:clamp(10px,.8vw,12px);text-transform:uppercase;letter-spacing:1.5px;color:var(--t4);margin:8px 0}
+.txn-m__d{font-size:clamp(13px,.95vw,15px);color:var(--t3);line-height:1.7}
+
+/* ═══════════════════════════════════════════════
+   ORBIT VIZ (Section 4)
+   ═══════════════════════════════════════════════ */
+.orbit-viz{width:100%;max-width:620px;height:clamp(420px,65vh,600px);position:relative}
+.orbit-viz canvas{position:absolute;inset:0;width:100%;height:100%}
+.orbit-li{cursor:pointer;padding:2px 6px;border-radius:6px;transition:background .2s}
+.orbit-li:hover,.orbit-li.active{background:rgba(255,255,255,.04)}
+
+.donut-viz{width:100%;max-width:620px;height:clamp(400px,62vh,580px);position:relative}
+.donut-viz canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+   ═══════════════════════════════════════════════ */
+@media(max-height:700px) and (min-width:901px){h2{font-size:clamp(22px,3.5vw,38px)}.hero-t{font-size:clamp(48px,10vw,120px)}.h-stats{margin-top:16px;gap:20px}}
+@media(max-height:600px) and (min-width:901px){.desc{display:none}.cue{display:none}.h-stat__l{display:none}.hero-t{font-size:clamp(40px,9vw,100px);margin-bottom:12px}h2{font-size:clamp(18px,3vw,30px)}}
+@media(max-height:500px){.hero-t{font-size:clamp(32px,8vw,72px)}h2{font-size:clamp(16px,2.5vw,24px)}.h-stats{display:none}}
+@media(max-width:900px){.half{padding:clamp(10px,2vh,20px) clamp(10px,2vw,20px)}}
+@media(prefers-reduced-motion:reduce){.r,.js .r{opacity:1;transform:none;filter:none;transition:none}*{animation-duration:.01ms!important;transition-duration:.01ms!important}html{scroll-behavior:auto}.mesh__b{animation:none!important}.glow{display:none}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(0,255,136,.15);border-radius:2px}
+
+/* ═══════════════════════════════════════════════
+   MOBILE PORTRAIT — vertical stacking, compact layout
+   Only applies when phone is held vertically
+   ═══════════════════════════════════════════════ */
+@media(max-width:600px) and (orientation:portrait){
+  /* Sections — stack vertically, allow overflow */
+  .s{overflow:visible !important}
+  .s--split{flex-direction:column !important;height:auto !important;min-height:100vh;min-height:100dvh}
+  .half{width:100% !important;flex:none !important;padding:clamp(8px,1.5vh,14px) clamp(10px,3vw,16px)}
+
+  /* Hero stats — 4 in a row, text wraps */
+  .hero-t{font-size:clamp(36px,11vw,60px) !important}
+  .h-stats{display:grid !important;grid-template-columns:repeat(4,1fr) !important;gap:6px !important;margin-top:14px;width:100%}
+  .h-stat{min-width:0 !important;overflow-wrap:break-word;word-break:break-word}
+  .h-stat__n{font-size:clamp(16px,4.5vw,24px) !important;white-space:nowrap}
+  .h-stat__l{font-size:clamp(6px,1.5vw,8px) !important;letter-spacing:0 !important;line-height:1.3;margin-top:3px}
+
+  /* Typography — smaller */
+  h2{font-size:clamp(18px,5vw,26px) !important;line-height:1.15}
+  .desc{font-size:clamp(12px,3vw,15px) !important}
+  .label{font-size:8px !important;letter-spacing:1px !important}
+
+  /* Padding — tighter */
+  .inner{padding:clamp(12px,2vh,20px) clamp(10px,2.5vw,16px) !important}
+
+  /* Canvas containers — full width, tall */
+  .pipe-viz{width:100% !important;max-width:100% !important;height:clamp(260px,65vw,360px) !important}
+  .donut-viz{width:100% !important;max-width:100% !important;height:clamp(280px,72vw,380px) !important}
+  .orbit-viz{width:100% !important;max-width:100% !important;height:clamp(280px,72vw,380px) !important}
+
+  /* Transaction pipe (s6) */
+  .txn-step{width:clamp(46px,12vw,64px)}
+  .txn-dot{width:22px;height:22px}
+  .txn-lbl{font-size:clamp(6px,1.5vw,8px)}
+  .txn-sub{font-size:5px}
+  .txn-timer{font-size:clamp(18px,5vw,28px)}
+
+  /* Transaction metrics — 3 columns */
+  .txn-metrics{gap:6px}
+  .txn-m{padding:8px 6px}
+  .txn-m__n{font-size:clamp(18px,4.5vw,28px)}
+  .txn-m__t{font-size:clamp(6px,1.5vw,8px);letter-spacing:0.5px}
+  .txn-m__d{font-size:clamp(8px,2vw,10px)}
+
+  /* ROI */
+  .roi-m{font-size:clamp(9px,2.3vw,11px)}
+  .roi-card{padding:10px}
+  .roi-card__tag{font-size:clamp(7px,1.8vw,9px)}
+  .roi-input label{font-size:clamp(10px,2.5vw,12px)}
+  .roi-input input{width:90px;font-size:14px;padding:6px 8px}
+
+  /* CTA */
+  .cta-btn{padding:12px 24px;font-size:clamp(13px,3.5vw,16px)}
+
+  /* Claims table */
+  .cl-wrap{-webkit-overflow-scrolling:touch}
+  .cl-t{min-width:460px}
+
+  /* Timeline (s5) */
+  .tl-l{font-size:clamp(6px,1.5vw,8px)}
+  .tl-n{width:16px;height:16px;font-size:7px}
+  .tl-detail{font-size:clamp(10px,2.5vw,13px);padding:8px}
+
+  /* Cinema (s7) */
+  .cine{height:auto !important;min-height:60vh}
+
+  /* Performance */
+  .glow{display:none !important}
+  .mesh__b:nth-child(n+4){display:none}
+  body::after{opacity:.002}
+}
+
+/* ═══════════════════════════════════════════════
+   MOBILE LANDSCAPE — phone sideways (~844px wide, ~390px tall)
+   Side-by-side layout, everything compact to fit short height
+   ═══════════════════════════════════════════════ */
+@media(max-height:500px){
+  /* ALL sections: fixed viewport height, clip overflow */
+  .s{height:100vh !important;height:100dvh !important;overflow:hidden !important}
+  .s::after{display:none}
+
+  /* Split sections — side by side like desktop */
+  .s--split{flex-direction:row !important;align-items:center !important}
+  .half{flex:1 !important;width:50% !important;padding:4px 10px !important;overflow:hidden}
+
+  /* Hero — very compact */
+  .hero-t{font-size:clamp(20px,5.5vw,36px) !important;margin-bottom:2px !important;line-height:.85 !important}
+  .h-stats{display:flex !important;flex-wrap:nowrap !important;gap:6px;margin-top:4px}
+  .h-stat__n{font-size:clamp(14px,2.2vw,24px) !important}
+  .h-stat__l{font-size:clamp(5px,.55vw,7px) !important;margin-top:1px}
+  /* Typography */
+  .inner{padding:6px 12px !important}
+  h2{font-size:clamp(14px,2.5vw,22px) !important;margin-bottom:3px !important}
+  .desc{font-size:clamp(9px,1.1vw,13px) !important;line-height:1.4 !important}
+  /* .label (green slide number) — FIXED 8px on ALL slides */
+  .label,.s .label,#s1 .label,#s2 .label,#s3 .label,#s4 .label,#s5 .label,#s6 .label,#s7 .label,#s8 .label,#s9 .label{font-size:8px !important;letter-spacing:1px !important;margin-bottom:3px !important}
+
+  /* Slide 3 — smaller to fit on 1 screen */
+  #s3 h2{font-size:clamp(13px,2.5vw,20px) !important;margin-bottom:3px !important;line-height:1.12 !important}
+  #s3 .desc{font-size:clamp(8px,1vw,12px) !important;line-height:1.35 !important}
+
+  /* Canvas — fit in half-screen, centered */
+  .pipe-viz{height:clamp(140px,85vh,260px) !important;max-width:100% !important}
+  .donut-viz{height:clamp(140px,85vh,260px) !important;max-width:100% !important}
+  .orbit-viz{height:clamp(140px,85vh,260px) !important;max-width:100% !important}
+
+  /* Lists inside s3/s4 — very small, no blockquote */
+  .s--split ul{font-size:clamp(6px,.8vw,9px) !important;line-height:1.3 !important;margin:1px 0 !important}
+  .s--split ul li{margin-bottom:0 !important}
+  #s3 p.desc{margin-top:0 !important;margin-bottom:0 !important}
+  #s3 p.desc.d3{margin-top:10px !important}
+  #s3 p.desc.d4{margin-top:8px !important}
+  #s3 ul{font-size:clamp(9px,1.2vw,13px) !important;line-height:1.4 !important;margin:0 !important}
+  #s3 blockquote{font-size:clamp(9px,1.1vw,12px) !important;padding:2px 0 2px 6px !important;margin:1px 0 0 !important;line-height:1.35 !important}
+  .orbit-li{font-size:clamp(8px,1vw,12px) !important;margin-bottom:1px !important;line-height:1.35 !important}
+  #s4 .desc{font-size:clamp(8px,1vw,11px) !important}
+
+  /* Timeline (s5) — compact */
+  .tl-detail{font-size:clamp(7px,.9vw,10px) !important;padding:4px !important}
+  .tl-l{font-size:clamp(5px,.6vw,7px) !important}
+  .tl-n{width:14px !important;height:14px !important;font-size:6px !important}
+
+  /* Transaction flow (s6) — compact */
+  .txn-timer{font-size:clamp(14px,2.5vw,20px) !important}
+  .txn-step{width:clamp(36px,8vw,50px) !important}
+  .txn-dot{width:18px !important;height:18px !important}
+  .txn-lbl{font-size:clamp(5px,.6vw,7px) !important}
+  .txn-sub{font-size:4px !important}
+  .txn-metrics{gap:8px !important}
+  .txn-m{padding:8px 12px !important}
+  .txn-m__n{font-size:clamp(12px,1.8vw,18px) !important}
+  .txn-m__t{font-size:clamp(8px,1.1vw,12px) !important;color:var(--t1) !important}
+  .txn-m__d{font-size:clamp(8px,1.1vw,12px) !important;line-height:1.4 !important;color:var(--t1) !important}
+
+  /* Slide dividers — visible separation between slides */
+  #s7,#s8{border-top:2px solid rgba(0,255,136,.25) !important;box-shadow:inset 0 1px 0 rgba(0,255,136,.1) !important}
+
+  /* Cinema (s7) — fit on one landscape screen */
+  #s7{height:100vh !important;height:100dvh !important;overflow:hidden !important;display:flex !important;flex-direction:column !important;justify-content:flex-start !important}
+  #s7 .inner{padding:2px 8px !important;display:flex !important;flex-direction:column !important;height:100% !important}
+  #s7 h2{font-size:9px !important;margin-bottom:0 !important;line-height:1 !important}
+  .cine{flex:1 !important;height:auto !important;min-height:0 !important;border-radius:4px !important;margin-top:0 !important}
+  #s7 .label{color:var(--g) !important;opacity:1 !important;text-shadow:0 0 20px var(--g-glow) !important}
+  .cine-tabs{display:flex !important;gap:0 !important}
+  .cine-tab{padding:3px 4px !important;font-size:6px !important;gap:2px !important;letter-spacing:0 !important}
+  .cine-tab__num{width:10px !important;height:10px !important;font-size:5px !important}
+  .cine-tab .tab-label{display:inline !important;font-size:6px !important}
+  .cine-stage{min-height:0 !important;flex-direction:row !important}
+  .cine-left{flex:0 0 60% !important;height:auto !important;min-height:0 !important;transform:none !important;border-right:1px solid rgba(255,255,255,.06) !important;border-bottom:none !important}
+  .cine-right{flex:1 !important;height:auto !important;min-height:0 !important;padding:4px 6px !important;overflow-y:auto !important}
+  .cine-topbar{height:20px !important;padding:0 4px !important;gap:3px !important;left:0 !important;top:0 !important}
+  .ct-val{font-size:7px !important}
+  .ct-label{font-size:4px !important}
+  .ct-sep{margin:0 1px !important}
+  .ct-badge{font-size:4px !important;padding:1px 3px !important}
+  .cm-item{gap:2px !important}
+  .cm-val{font-size:7px !important}
+  .cm-label{font-size:4px !important;letter-spacing:.5px !important}
+  .cs-icon{width:16px !important;height:16px !important}
+  .cs-icon svg{width:10px !important;height:10px !important}
+  .ann-icon{width:16px !important;height:16px !important;margin-bottom:2px !important;border-radius:4px !important}
+  .ann-icon svg{width:9px !important;height:9px !important}
+  .ann-step{font-size:5px !important;letter-spacing:.5px !important;margin-bottom:1px !important}
+  .ann-title{font-size:8px !important;margin-bottom:2px !important;line-height:1.15 !important}
+  .ann-desc{font-size:6px !important;line-height:1.25 !important;margin-bottom:3px !important}
+  .ann-highlight{font-size:6px !important;padding:2px 4px !important;margin-bottom:2px !important}
+  .ann-metric__val{font-size:9px !important}
+  .ann-metric__label{font-size:5px !important}
+  .ann-metric{margin-bottom:4px !important}
+  .ann-dots{padding-top:3px !important;gap:4px !important}
+  .ann-dot{width:5px !important;height:5px !important}
+  .sc-layer{top:0 !important;left:0 !important;padding:4px !important}
+  .dm{max-width:240px !important;border-radius:6px !important}
+  .dm-hdr{padding:4px 8px !important}
+  .dm-hdr__icon{width:18px !important;height:18px !important}
+  .dm-hdr__title{font-size:9px !important}
+  .dm-body{padding:4px 8px !important}
+  .dm-sub{font-size:7px !important;margin-bottom:6px !important}
+  .dm-field{margin-bottom:4px !important}
+  .dm-field__label{font-size:6px !important}
+  .dm-field__input{padding:4px 6px !important;font-size:8px !important}
+  .dm-banks{gap:4px !important;padding:3px 0 !important}
+  .dm-bank{padding:6px 4px !important;gap:3px !important;border-radius:6px !important}
+  .dm-bank__icon{width:20px !important;height:20px !important;font-size:9px !important;border-radius:5px !important}
+  .dm-bank__name{font-size:7px !important}
+  .dm-btn{padding:4px 10px !important;font-size:8px !important}
+  .dm-actions{margin-top:6px !important}
+  .dm-success__title{font-size:10px !important}
+  .dm-success__sub{font-size:7px !important;margin-bottom:6px !important}
+  .dm-check{width:24px !important;height:24px !important;margin-bottom:4px !important}
+  .dm-success__row{font-size:8px !important;margin-bottom:3px !important}
+  .wlt-row{padding:4px 6px !important;gap:4px !important;border-radius:6px !important;max-width:240px !important}
+  .sum-grid{gap:4px !important;max-width:240px !important}
+  .sum-card{padding:4px !important;border-radius:5px !important}
+  .sum-card__val{font-size:12px !important}
+  .sum-card__label{font-size:5px !important;letter-spacing:.5px !important;margin-top:2px !important}
+
+  /* ROI (s8) */
+  .roi-card{padding:4px !important}
+  .roi-m{font-size:clamp(7px,.8vw,9px) !important}
+
+  /* CTA (s9) */
+  .cta-btn{padding:8px 20px !important;font-size:clamp(11px,1.5vw,14px) !important}
+
+  /* Hide extras */
+  .cue{display:none !important}
+  .nav{display:none !important}
+  .glow{display:none !important}
+  .mesh__b:nth-child(n+4){display:none}
+}
+
+/* ═══ VIDEO BACKGROUND ═══ */
+.vid-bg{position:absolute;inset:0;z-index:0;overflow:hidden}
+.vid-bg video{width:100%;height:100%;object-fit:cover;opacity:0.2;filter:saturate(0.7)}
+.vid-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,var(--bg) 0%,transparent 20%,transparent 80%,var(--bg) 100%)}
+</style>
+</head>
+<body>
+
+<!-- ═══ AMBIENT MESH ═══ -->
+<div class="mesh" id="mesh">
+  <div class="mesh__b"></div><div class="mesh__b"></div><div class="mesh__b"></div><div class="mesh__b"></div><div class="mesh__b"></div><div class="mesh__b"></div>
+</div>
+
+<!-- ═══ CURSOR GLOW ═══ -->
+<div class="glow" id="glow"></div>
+
+<!-- ═══ UI ═══ -->
+<div id="pbar"></div>
+
+<!-- ═══ LIGHTBOX ═══ -->
+<div class="lb" id="lb" onclick="closeLb(event)">
+  <button class="lb__close" onclick="closeLb(event)">&#10005;</button>
+  <img id="lb-img" src="">
+</div>
+
+<!-- ═══ NAV DOTS ═══ -->
+<nav class="nav" id="nav">
+  <button class="nav__d on" data-l="Начало" onclick="goS(0)"></button>
+  <button class="nav__d" data-l="Потери" onclick="goS(1)"></button>
+  <button class="nav__d" data-l="Рынок" onclick="goS(2)"></button>
+  <button class="nav__d" data-l="Подход" onclick="goS(3)"></button>
+  <button class="nav__d" data-l="Транзакция" onclick="goS(4)"></button>
+  <button class="nav__d" data-l="Результат" onclick="goS(5)"></button>
+  <button class="nav__d" data-l="Система" onclick="goS(6)"></button>
+  <button class="nav__d" data-l="Лояльность" onclick="goS(7)"></button>
+  <button class="nav__d" data-l="Старт" onclick="goS(8)"></button>
+</nav>
+
+<!-- ═══════════════════════════════════════════════
+     01 · HERO
+     ═══════════════════════════════════════════════ -->
+<section class="s s--col" id="s1">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-video-1.mp4"></video></div>
+  <div class="inner" style="text-align:left;max-width:1100px">
+    <div class="label r">Automation-first инфраструктура для high-risk</div>
+    <div class="hero-t r d1" id="scramble">RAPIDOLAR</div>
+    <p class="desc r d2">Единственная на рынке система полного цикла. Весь трафик обрабатывается автоматически — в десятки раз эффективнее ручного конвейера.<br>Не PSP. Не ещё одна площадка. Без операторов. Без хвостов.</p>
+    <div class="h-stats r d3">
+      <div class="h-stat"><div class="h-stat__n"><span class="acc" data-count="100">0</span>%</div><div class="h-stat__l">автоматизация <span style="color:var(--rd)">vs 15% у рынка</span></div></div>
+      <div class="h-stat"><div class="h-stat__n">&lt;<span class="acc" data-count="30">0</span>с</div><div class="h-stat__l">на выплату <span style="color:var(--rd)">vs 15 мин у рынка</span></div></div>
+      <div class="h-stat"><div class="h-stat__n"><span class="acc">0.8</span>%</div><div class="h-stat__l">ошибок <span style="color:var(--rd)">vs 7% у рынка</span></div></div>
+      <div class="h-stat"><div class="h-stat__n"><span class="acc" data-count="0">0</span></div><div class="h-stat__l">сотрудников <span style="color:var(--rd)">vs 50+ в PSP</span></div></div>
+    </div>
+  </div>
+  <div class="cue"><span></span><small>листай</small></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     02 · PAIN 1 — DEPENDENCY CHAIN
+     ═══════════════════════════════════════════════ -->
+<section class="s s--split" id="s2">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-s2-finance.mp4"></video></div>
+  <div class="half">
+    <div class="label r">02 · Скрытые потери</div>
+    <h2 class="r d1">Вы зарабатываете репутацию, трафик и клиентов.<br>Кто-то другой всё это теряет.</h2>
+    <p class="desc r d2">Ваши и деньги ваших клиентов проходят через цепочку: PSP → площадка → агенты → операторы. Внизу этой цепочки — люди, которые обрабатывают заявки. Люди, которых вы не нанимали, не контролируете и не можете уволить.</p>
+    <p class="desc r d3" style="margin-top:12px;color:var(--t3)">Площадки автоматизируют для таких агентов <strong style="color:var(--am)">15–20%</strong> процессов. Остальное — ручной разбор операторами в пиковые часы. Каждая ошибка внизу цепочки — это ваш недовольный клиент, ваш чарджбэк, ваша потерянная лояльность.</p>
+  </div>
+  <div class="half" style="align-items:center;position:relative">
+    <div class="pipe-viz r d2" id="pipe-viz">
+      <canvas id="pipe-canvas"></canvas>
+      <div class="pipe-zone pipe-zone--1">Мерчант</div>
+      <div class="pipe-zone pipe-zone--2">Площадка</div>
+      <div class="pipe-zone pipe-zone--3">Агенты</div>
+      <div class="pipe-stats">
+        <div class="pipe-stat pipe-stat--ok"><span id="ps-ok">0</span> одобрено</div>
+        <div class="pipe-stat pipe-stat--err"><span id="ps-err">0</span> ошибок</div>
+        <div class="pipe-stat pipe-stat--dis"><span id="ps-dis">0</span> споров</div>
+        <div class="pipe-stat pipe-stat--del"><span id="ps-del">0</span> задержек</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     03 · PAIN 2 — FAKE AUTOMATION
+     ═══════════════════════════════════════════════ -->
+<section class="s s--split" id="s3">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-video-2.mp4"></video></div>
+  
+  <div class="half" style="align-items:center">
+    <div class="donut-viz r d1" id="donut-viz">
+      <canvas id="donut-canvas"></canvas>
+    </div>
+  </div>
+  <div class="half">
+    <div class="label r">03 · Ложная автоматизация</div>
+    <h2 class="r d1">Рынок говорит у нас «автоматизация».<br>На деле у каждого агента — конвейер ручных операторов.</h2>
+    <p class="desc r d2">На рынке автоматизирован только приём денежных поступлений. Точка. Площадки на большее не способны — а это 15–20% от полного цикла обработки.</p>
+    <p class="desc r d3" style="margin-top:10px;color:var(--t1)">А кто делает остальные 85%?</p>
+    <ul style="list-style:none;padding:0;margin:4px 0 0;font-size:clamp(12px,.95vw,14px);line-height:1.85" class="r d3">
+      <li style="color:var(--rd)">&#10007; Выплаты — оператор вручную</li>
+      <li style="color:var(--rd)">&#10007; Апелляции и споры — вручную</li>
+      <li style="color:var(--rd)">&#10007; Запросы поддержки — вручную</li>
+      <li style="color:var(--am)">&#10007; Закупки ликвидности на P2P — вручную</li>
+      <li style="color:var(--am)">&#10007; Сбои и зависшие транзакции — вручную</li>
+    </ul>
+    <p class="desc r d4" style="margin-top:10px;color:var(--t3)">Каждый новый агент со своим штатом — новый источник ошибок, споров и задержек.</p>
+    <blockquote class="r d5" style="margin:14px 0 0;padding:14px 0 14px 18px;border-left:3px solid var(--g);line-height:1.7;font-size:clamp(15px,1.2vw,18px)">
+      <span style="color:var(--t2)">Автоматизация — это не когда «первые 20% делаются сами».</span><br>
+      <strong style="color:var(--t1)">Автоматизация</strong> <span style="color:var(--t2)">— это когда</span> <strong style="color:var(--g)">система доводит все операции до результата</strong><span style="color:var(--t2)">, а</span> <strong style="color:var(--t1)">человек не является обязательным звеном.</strong>
+    </blockquote>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     04 · OUR APPROACH + TECH COMPRESSED
+     ═══════════════════════════════════════════════ -->
+<section class="s s--split" id="s4">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-video-3.mp4"></video></div>
+  
+  <div class="half" style="align-items:center">
+    <div class="orbit-viz r d1" id="orbit-viz">
+      <canvas id="orbit-canvas"></canvas>
+    </div>
+  </div>
+  <div class="half">
+    <div class="label r">04 · Полный цикл</div>
+    <h2 class="r d1">Не ускоряем операторов.<br>Заменяем их.</h2>
+    <p class="desc r d2">RAPIDOLAR повышает скорость обработки заявок <strong style="color:var(--g)">x30</strong> и качество обработки <strong style="color:var(--g)">x8–9</strong>.</p>
+    <ul style="list-style:none;padding:0;margin:8px 0 0;line-height:1.9;font-size:clamp(14px,1.15vw,17px)" class="r d3">
+      <li class="orbit-li" data-orbit="0" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--cy)">Экосистема</strong> <span style="color:var(--t1)">— превращает банковские счета и кошельки в управляемую структуру. KYC, лимиты, кулдауны — всё под контролем автоматики.</span></li>
+      <li class="orbit-li" data-orbit="1" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--g)">Выплаты</strong> <span style="color:var(--t1)">— система сама проводит переводы, получает подтверждение и прикрепляет чеки.</span></li>
+      <li class="orbit-li" data-orbit="2" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--am)">Балансы</strong> <span style="color:var(--t1)">— контролирует остатки на всех буферных кошельках и делает сверки после каждой операции.</span></li>
+      <li class="orbit-li" data-orbit="3" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--pu)">Ликвидность</strong> <span style="color:var(--t1)">— сама закупает USDT для взаиморасчётов, когда баланс падает ниже порога.</span></li>
+      <li class="orbit-li" data-orbit="4" style="color:var(--t2);margin-bottom:6px"><strong style="color:#4dd0c8">Поддержка</strong> <span style="color:var(--t1)">— обрабатывает запросы и споры: находит транзакцию, проверяет статус, закрывает тикет и прикрепляет видеоподтверждения.</span></li>
+    </ul>
+    <p class="desc r d4" style="margin-top:12px"><span style="color:var(--t1)">Не «50% автоматизировали, остальное руками».</span> <strong style="color:var(--g)">100% цикл.</strong> <span style="color:var(--t2)">Заявки, сверки, выплаты, балансы, ликвидность, споры — без ручных хвостов.</span></p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     05 · END-TO-END — LIFE OF A TRANSACTION
+     ═══════════════════════════════════════════════ -->
+<section class="s s--col" id="s5">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-s5-network.mp4"></video></div>
+  <div class="inner" style="max-width:960px">
+    <div class="label r" style="text-align:center">05 · Как это работает</div>
+    <h2 class="r d1" style="text-align:center">Многоуровневая система автоматизации<br>поверх банковских приложений и API</h2>
+    <div class="tl-wrap r d2">
+      <div class="tl-steps" id="tl-steps">
+        <div class="tl-s on" onclick="setStep(0)"><div class="tl-n">1</div><div class="tl-l">Маршрут</div></div>
+        <div class="tl-s" onclick="setStep(1)"><div class="tl-n">2</div><div class="tl-l">UI-слой</div></div>
+        <div class="tl-s" onclick="setStep(2)"><div class="tl-n">3</div><div class="tl-l">API-слой</div></div>
+        <div class="tl-s" onclick="setStep(3)"><div class="tl-n">4</div><div class="tl-l">Аналитика</div></div>
+        <div class="tl-s" onclick="setStep(4)"><div class="tl-n">5</div><div class="tl-l">Адаптация</div></div>
+        <div class="tl-s" onclick="setStep(5)"><div class="tl-n">6</div><div class="tl-l">Масштаб</div></div>
+      </div>
+      <div class="tl-detail" id="tl-detail"></div>
+      <div class="tl-btns"><button class="tl-btn" onclick="setStep(Math.max(0,cs-1))">&#8592;</button><button class="tl-btn" onclick="setStep(Math.min(5,cs+1))">&#8594;</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     06 · WHAT YOU GET — SPEED / DISPUTES / SCALE
+     ═══════════════════════════════════════════════ -->
+<section class="s s--col" id="s6">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-video-4.mp4"></video></div>
+  
+  <div class="inner" style="text-align:center;max-width:1020px">
+    <div class="label r">06 · Что вы получаете</div>
+    <h2 class="r d1">Скорость. Точность. Масштаб.</h2>
+    <p class="desc r d2" style="text-align:center;margin:0 auto clamp(12px,2vh,20px);color:var(--t3)">Клиентам не важно, как устроена система. Им важно: деньги пришли быстро и без ошибок.</p>
+
+    <!-- Transaction pipeline -->
+    <div class="txn-flow r d2" id="txn-flow">
+      <div class="txn-pipe">
+        <div class="txn-step" data-s="0"><div class="txn-dot"></div><div class="txn-lbl">Заявка</div><div class="txn-sub">мерчант отправляет запрос</div></div>
+        <div class="txn-line"><div class="txn-pulse"></div></div>
+        <div class="txn-step" data-s="1"><div class="txn-dot"></div><div class="txn-lbl">Скоринг</div><div class="txn-sub">выбор лучшего маршрута</div></div>
+        <div class="txn-line"><div class="txn-pulse"></div></div>
+        <div class="txn-step" data-s="2"><div class="txn-dot"></div><div class="txn-lbl">Выплата</div><div class="txn-sub">перевод + подтверждение</div></div>
+        <div class="txn-line"><div class="txn-pulse"></div></div>
+        <div class="txn-step" data-s="3"><div class="txn-dot"></div><div class="txn-lbl">Проверка</div><div class="txn-sub">API + push + OCR</div></div>
+        <div class="txn-line"><div class="txn-pulse"></div></div>
+        <div class="txn-step" data-s="4"><div class="txn-dot"></div><div class="txn-lbl">Коллбек</div><div class="txn-sub">клиент получил деньги</div></div>
+      </div>
+      <div class="txn-timer" id="txn-timer">0.0<span style="font-size:.5em;opacity:.5"> сек</span></div>
+    </div>
+
+    <!-- 3 metrics -->
+    <div class="txn-metrics r d3">
+      <div class="txn-m">
+        <div class="txn-m__n" style="color:var(--g)"><span id="m-speed">0</span> сек</div>
+        <div class="txn-m__t">Скорость Pay-in / Pay-Out</div>
+        <div class="txn-m__d">От заявки до подтверждения. Без очередей, любая нагрузка. Клиент получил деньги — клиент доволен.</div>
+      </div>
+      <div class="txn-m">
+        <div class="txn-m__n" style="color:var(--am)">&lt;<span id="m-disp">0</span>%</div>
+        <div class="txn-m__t">Апелляции</div>
+        <div class="txn-m__d">Автоматическая обработка, снижает кол-во жалоб. Система сама собирает доказательства и разрешает споры. Вместо 7% у агентов — менее 1% у нас.</div>
+      </div>
+      <div class="txn-m">
+        <div class="txn-m__n" style="color:var(--cy)">&#8734;</div>
+        <div class="txn-m__t">Расширяемость</div>
+        <div class="txn-m__d">Подключаем новый метод или страну без переработки системы. Любой банк, любой язык интерфейса.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- 07 · WORKFLOW CINEMA -->
+<section class="s s--col" id="s7" style="height:auto;min-height:100vh;scroll-snap-align:start;overflow:visible">
+  <div class="inner" style="text-align:center;max-width:100%;padding:clamp(16px,2vh,28px) clamp(16px,2vw,32px);position:relative;z-index:2">
+    <div class="label r" id="s7label">07 · Наблюдаемость</div>
+    <h2 class="r d1" id="s7h2">Вся система — один экран.</h2>
+
+<style>
+/* S7 OVERRIDES — no media query, always apply */
+#s7label{font-size:8px !important;color:#00ff88 !important;text-shadow:0 0 24px rgba(0,255,136,.5) !important;opacity:1 !important;filter:none !important;transform:none !important;letter-spacing:1px !important;margin-bottom:2px !important}
+#s7h2{font-size:10px !important;margin-bottom:2px !important;line-height:1.1 !important;opacity:1 !important;filter:none !important;transform:none !important}
+#s7 .cine{max-height:80vh !important;margin-top:0 !important}
+@media(max-height:500px){#s7 .cine{max-height:78vh !important}}
+/* ═══════════════════════════════════════════════
+   CINEMA FRAME — the theatre wrapper
+   ═══════════════════════════════════════════════ */
+.cine{width:100%;height:min(88vh,880px);border-radius:16px;border:1px solid rgba(255,255,255,.06);background:linear-gradient(160deg,rgba(8,8,14,.97) 0%,rgba(5,5,10,.98) 50%,rgba(8,8,16,.97) 100%);box-shadow:0 0 100px 30px rgba(5,5,8,.6),0 40px 80px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.03) inset,0 0 80px rgba(0,255,136,.03);display:flex;flex-direction:column;overflow:hidden;position:relative;transition:transform .35s var(--ease),box-shadow .35s var(--ease);margin-top:clamp(8px,1.5vh,16px)}
+.cine:hover{box-shadow:0 0 100px 30px rgba(5,5,8,.6),0 48px 96px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.04) inset,0 0 90px rgba(0,255,136,.04)}
+
+/* ═══ TOP TABS ═══ */
+.cine-tabs{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);flex-shrink:0;background:rgba(0,0,0,.3)}
+.cine-tab{flex:1;padding:16px 24px;font-family:var(--mono);font-size:14px;color:var(--t3);cursor:pointer;transition:all .3s var(--ease);display:flex;align-items:center;justify-content:center;gap:10px;border-bottom:2px solid transparent;letter-spacing:.5px;user-select:none;position:relative}
+.cine-tab:hover{color:var(--t2);background:rgba(255,255,255,.015)}
+.cine-tab.on{color:var(--g);border-bottom-color:var(--g);background:rgba(0,255,136,.03)}
+.cine-tab__num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;border:1px solid currentColor;flex-shrink:0}
+.cine-tab.on .cine-tab__num{background:var(--g);color:#000;border-color:var(--g);box-shadow:0 0 12px var(--g-glow)}
+
+/* ═══ STAGE ═══ */
+.cine-stage{flex:1;display:flex;overflow:hidden;position:relative;min-height:0}
+.cine-left{flex:0 0 60%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-right:1px solid rgba(255,255,255,.06)}
+/* ═══ COMMAND CENTER GRID — dashboard behind glass ═══ */
+.cine-left::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,255,136,.012) 1px,transparent 1px),linear-gradient(90deg,rgba(0,255,136,.008) 1px,transparent 1px);background-size:44px 44px;z-index:0;opacity:.7}
+/* ═══ SCANNING LINE — CRT radar sweep ═══ */
+.cine-left::after{content:'';position:absolute;left:0;right:0;top:0;height:120px;background:linear-gradient(180deg,transparent 0%,rgba(0,255,136,.015) 40%,rgba(6,182,212,.008) 60%,transparent 100%);z-index:1;pointer-events:none;animation:cineScan 6s linear infinite;will-change:transform}
+@keyframes cineScan{0%{transform:translateY(-120px)}100%{transform:translateY(calc(100vh + 120px))}}
+.cine-right{flex:0 0 40%;display:flex;flex-direction:column;padding:32px 28px;position:relative;overflow:hidden;background:rgba(255,255,255,.008)}
+
+/* ═══ SCENARIO LAYER ═══ */
+.sc-layer{position:absolute;top:48px;left:52px;right:0;bottom:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s var(--ease);padding:20px}
+.sc-layer.on{opacity:1;pointer-events:auto}
+
+/* ═══ ANNOTATIONS (right side) ═══ */
+.ann-layer{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s var(--ease);display:flex;flex-direction:column;padding:28px 24px}
+.ann-layer.on{opacity:1;pointer-events:auto}
+.ann-icon{width:56px;height:56px;border-radius:14px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-bottom:16px;box-shadow:0 0 20px rgba(0,255,136,.04)}
+.ann-icon svg{width:28px;height:28px;stroke:var(--g);fill:none;stroke-width:1.5}
+.ann-step{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:2.5px;color:var(--g);margin-bottom:8px;opacity:.8}
+.ann-title{font-family:var(--display);font-size:22px;font-weight:600;color:var(--t1);line-height:1.3;margin-bottom:10px}
+.ann-desc{font-family:var(--sans);font-size:15px;color:var(--t2);line-height:1.65;margin-bottom:18px}
+.ann-highlight{font-family:var(--mono);font-size:13px;color:var(--cy);padding:10px 14px;background:rgba(6,182,212,.06);border:1px solid rgba(6,182,212,.12);border-radius:8px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.ann-highlight::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--cy);flex-shrink:0;box-shadow:0 0 8px var(--cy-glow)}
+.ann-metric{display:flex;align-items:baseline;gap:10px;margin-bottom:10px}
+.ann-metric__val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--g);line-height:1}
+.ann-metric__label{font-family:var(--mono);font-size:10px;color:var(--t4);text-transform:uppercase;letter-spacing:1.5px}
+
+/* ═══ STEP DOT INDICATOR ═══ */
+.ann-dots{margin-top:auto;display:flex;align-items:center;gap:12px;padding-top:18px;border-top:1px solid rgba(255,255,255,.06)}
+.ann-dot{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.08);transition:all .4s var(--ease)}
+.ann-dot.done{background:var(--g);box-shadow:0 0 10px var(--g-glow)}
+.ann-dot.active{background:var(--g);box-shadow:0 0 12px var(--g-glow);transform:scale(1.5)}
+.ann-dots__text{font-family:var(--mono);font-size:10px;color:var(--t4);margin-left:auto;white-space:nowrap}
+
+/* ═══ MODAL COMPONENT ═══ */
+.dm{background:#0c0c16;border:1px solid rgba(255,255,255,.1);border-radius:14px;box-shadow:0 30px 60px rgba(0,0,0,.6),0 0 40px rgba(0,255,136,.02);width:100%;max-width:480px;padding:0;overflow:hidden;animation:dmIn .4s var(--ease) forwards;opacity:0;transform:translateY(8px) scale(.97);position:relative;z-index:2}
+@keyframes dmIn{to{opacity:1;transform:translateY(0) scale(1)}}
+.dm-hdr{padding:18px 24px 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.06)}
+.dm-hdr__icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dm-hdr__title{font-family:var(--display);font-size:17px;font-weight:600;color:var(--t1)}
+.dm-hdr__x{margin-left:auto;width:20px;height:20px;border-radius:5px;background:rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;cursor:pointer}
+.dm-hdr__x svg{width:11px;height:11px;stroke:var(--t4);fill:none;stroke-width:2}
+.dm-body{padding:18px 24px 24px}
+.dm-sub{font-family:var(--sans);font-size:12px;color:var(--t3);margin-bottom:14px}
+
+/* ═══ FORM FIELDS ═══ */
+.dm-field{margin-bottom:12px}
+.dm-field__label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t4);margin-bottom:5px;display:block}
+.dm-field__input{width:100%;padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:7px;font-family:var(--mono);font-size:12px;color:var(--g);outline:none;transition:border-color .2s}
+.dm-field__input:focus,.dm-field__input.typing{border-color:rgba(0,255,136,.2);box-shadow:0 0 0 2px rgba(0,255,136,.05)}
+.dm-field__input::placeholder{color:var(--t4)}
+
+/* ═══ BANK CHOICE ═══ */
+.dm-banks{display:flex;gap:12px;padding:8px 0}
+.dm-bank{flex:1;padding:20px 16px;border:1px solid rgba(255,255,255,.06);border-radius:12px;display:flex;flex-direction:column;align-items:center;gap:10px;cursor:pointer;transition:all .3s var(--ease);background:rgba(255,255,255,.01)}
+.dm-bank:hover,.dm-bank.hovered{border-color:rgba(0,255,136,.2);background:rgba(0,255,136,.03);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.dm-bank.hovered .dm-bank__icon{box-shadow:0 0 20px rgba(0,255,136,.2)}
+.dm-bank__icon{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;transition:box-shadow .3s}
+.dm-bank__name{font-family:var(--mono);font-size:12px;color:var(--t2)}
+
+/* ═══ BUTTONS ═══ */
+.dm-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 22px;border-radius:7px;font-family:var(--mono);font-size:12px;font-weight:600;cursor:pointer;transition:all .25s var(--ease);border:none;outline:none}
+.dm-btn--primary{background:var(--g);color:#000;box-shadow:0 0 16px var(--g-glow)}
+.dm-btn--primary:hover,.dm-btn--primary.pulse{box-shadow:0 0 24px var(--g-glow);transform:translateY(-1px)}
+.dm-btn--primary.pulse{animation:btnPulse .6s var(--ease)}
+@keyframes btnPulse{0%{box-shadow:0 0 16px var(--g-glow)}50%{box-shadow:0 0 30px rgba(0,255,136,.5)}100%{box-shadow:0 0 16px var(--g-glow)}}
+.dm-btn--ghost{background:transparent;color:var(--t3);border:1px solid rgba(255,255,255,.06)}
+.dm-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+
+/* ═══ SUCCESS CHECKMARK ═══ */
+.dm-success{display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 0}
+.dm-check{width:56px;height:56px;margin-bottom:12px;position:relative}
+.dm-check__circle{cx:28;cy:28;r:24;fill:none;stroke:var(--g);stroke-width:2;stroke-dasharray:150.8;stroke-dashoffset:150.8;animation:checkCircle .6s var(--ease) forwards}
+@keyframes checkCircle{to{stroke-dashoffset:0}}
+.dm-check__tick{fill:none;stroke:var(--g);stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:30;stroke-dashoffset:30;animation:checkTick .3s var(--ease) .5s forwards}
+@keyframes checkTick{to{stroke-dashoffset:0}}
+.dm-check__glow{cx:28;cy:28;r:26;fill:none;stroke:var(--g);stroke-width:1;opacity:0;animation:checkGlow 1s ease .6s forwards}
+@keyframes checkGlow{0%{r:26;opacity:.4}100%{r:36;opacity:0}}
+.dm-success__title{font-family:var(--display);font-size:16px;font-weight:600;color:var(--g);margin-bottom:8px}
+.dm-success__sub{font-family:var(--sans);font-size:12px;color:var(--t3);margin-bottom:14px}
+.dm-success__row{display:flex;align-items:center;gap:10px;margin-bottom:6px;font-family:var(--mono);font-size:11px}
+.dm-success__label{color:var(--t4);min-width:46px}
+.dm-success__val{color:var(--t1);font-weight:500}
+.dm-success__badge{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:5px;background:rgba(0,255,136,.1);color:var(--g)}
+
+/* ═══ WALLET ROW ANIMATION ═══ */
+.wlt-row{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;animation:wltIn .5s var(--ease) forwards;opacity:0;transform:translateX(-10px);width:100%;max-width:500px}
+@keyframes wltIn{to{opacity:1;transform:translateX(0)}}
+.wlt-row__gauge{width:42px;height:42px;flex-shrink:0;position:relative}
+.wlt-row__gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.wlt-row__gauge__val{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:700;color:var(--t1)}
+.wlt-row__info{flex:1;min-width:0}
+.wlt-row__name{font-family:var(--sans);font-size:12px;font-weight:500;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wlt-row__meta{font-family:var(--mono);font-size:9px;color:var(--t4)}
+.wlt-row__amt{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--g);flex-shrink:0}
+.wlt-row__status{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g-glow);animation:blink 2s ease infinite;flex-shrink:0}
+
+/* ═══ FAKE CURSOR ═══ */
+.fcursor{position:absolute;width:18px;height:18px;z-index:50;pointer-events:none;transition:all .6s cubic-bezier(.23,1,.32,1);opacity:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,.5))}
+.fcursor.vis{opacity:1}
+.fcursor.click{animation:curClick .3s ease}
+@keyframes curClick{0%{transform:scale(1)}50%{transform:scale(.85)}100%{transform:scale(1)}}
+
+/* ═══ PAYOUT TABLE ═══ */
+.po-tbl{width:100%;max-width:500px;font-family:var(--mono);font-size:11px}
+.po-tbl__hdr{display:flex;gap:0;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.po-tbl__hdr span{color:var(--t4);text-transform:uppercase;letter-spacing:1.2px;font-size:9px}
+.po-row{display:flex;align-items:center;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.03);transition:background .3s;position:relative}
+.po-row.highlight{background:rgba(255,170,0,.04);animation:poHighlight 1s ease}
+@keyframes poHighlight{0%{background:rgba(255,170,0,.12)}100%{background:rgba(255,170,0,.04)}}
+.po-row.success{background:rgba(0,255,136,.03)}
+.po-col{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.po-col--sum{flex:0 0 100px;color:var(--t1);font-weight:600}
+.po-col--who{flex:1;color:var(--t3);min-width:0}
+.po-col--status{flex:0 0 90px;text-align:right}
+.po-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600}
+.po-badge--wait{background:rgba(255,170,0,.1);color:var(--am)}
+.po-badge--proc{background:rgba(6,182,212,.1);color:var(--cy)}
+.po-badge--done{background:rgba(0,255,136,.1);color:var(--g)}
+
+/* ═══ SPINNER ═══ */
+.po-spin{width:10px;height:10px;border:1.5px solid rgba(6,182,212,.2);border-top-color:var(--cy);border-radius:50%;animation:spin .6s linear infinite;display:inline-block;vertical-align:middle;margin-right:4px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ═══ CASCADE BLOCK ═══ */
+.cas-block{padding:12px 14px;background:rgba(6,182,212,.04);border:1px solid rgba(6,182,212,.1);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--cy);margin-top:10px;animation:casIn .4s var(--ease) forwards;opacity:0;transform:translateY(6px)}
+@keyframes casIn{to{opacity:1;transform:translateY(0)}}
+.cas-block__arrow{color:var(--t4);margin:0 4px}
+.cas-block__ok{color:var(--g);font-weight:700}
+
+/* ═══ TRANSFER ANIMATION ═══ */
+.transfer-bar{width:100%;height:4px;background:rgba(255,255,255,.04);border-radius:2px;margin:10px 0;overflow:hidden}
+.transfer-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--cy));border-radius:2px;width:0;transition:width 2.5s var(--ease)}
+.transfer-fill.go{width:100%}
+
+/* ═══ PUSH NOTIFICATION ═══ */
+.push-notif{display:flex;align-items:center;gap:12px;padding:14px 18px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;max-width:380px;animation:pushIn .4s var(--ease) forwards;opacity:0;transform:translateY(-12px)}
+@keyframes pushIn{to{opacity:1;transform:translateY(0)}}
+.push-notif__icon{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#6c5ce7,#a29bfe);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;font-weight:700;color:#fff}
+.push-notif__body{flex:1;min-width:0}
+.push-notif__app{font-family:var(--mono);font-size:9px;color:var(--t4);text-transform:uppercase;letter-spacing:1.2px}
+.push-notif__text{font-family:var(--sans);font-size:13px;color:var(--t1);margin-top:3px;line-height:1.4}
+
+/* ═══ MATCH BLOCK ═══ */
+.match-block{padding:12px 16px;background:rgba(0,255,136,.03);border:1px solid rgba(0,255,136,.1);border-radius:8px;font-family:var(--mono);font-size:11px;color:var(--t2);margin-top:12px;animation:casIn .4s var(--ease) forwards;opacity:0;transform:translateY(6px);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.match-block__ok{color:var(--g);font-weight:700;font-size:12px}
+
+/* ═══ BALANCE TICK ═══ */
+.bal-tick{display:flex;align-items:baseline;gap:6px;margin-top:10px}
+.bal-tick__val{font-family:var(--mono);font-size:26px;font-weight:700;color:var(--g);transition:all .3s}
+.bal-tick__cur{font-family:var(--mono);font-size:12px;color:var(--t4)}
+.bal-tick__delta{font-family:var(--mono);font-size:12px;color:var(--g);animation:deltaIn .3s var(--ease)}
+@keyframes deltaIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ═══ SUMMARY COUNTERS ═══ */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:500px}
+.sum-card{padding:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:10px;text-align:center;animation:dmIn .4s var(--ease) forwards;opacity:0}
+.sum-card__val{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--g);line-height:1}
+.sum-card__label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:1.2px;color:var(--t4);margin-top:6px}
+
+/* ═══ CRM STATUS ═══ */
+.crm-status{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:7px;font-family:var(--mono);font-size:12px;animation:casIn .4s var(--ease) forwards;opacity:0}
+.crm-status--pending{background:rgba(255,170,0,.06);border:1px solid rgba(255,170,0,.1);color:var(--am)}
+.crm-status--done{background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.1);color:var(--g)}
+.crm-arrow{font-size:14px;color:var(--t4);margin:6px 0}
+
+/* ═══ CONVERSION ROW ═══ */
+.conv-row{font-family:var(--mono);font-size:12px;color:var(--t3);padding:8px 12px;background:rgba(255,255,255,.02);border-radius:7px;margin-top:10px;text-align:center}
+.conv-row b{color:var(--t1)}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:800px){
+  .cine{height:auto;min-height:500px}
+  .cine-stage{flex-direction:column}
+  .cine-left{flex:none;height:300px;border-right:none;border-bottom:1px solid rgba(255,255,255,.04)}
+  .cine-right{flex:none;min-height:200px}
+  .cine-tab{font-size:9px;padding:10px 8px}
+  .cine-tab span.tab-label{display:none}
+}
+@media(max-width:500px){
+  .cine{border-radius:10px}
+  .cine-left{height:220px}
+  .cine-right{min-height:180px}
+  .cine-topbar{height:36px;padding:0 10px;gap:8px}
+  .ct-val{font-size:12px}
+  .ct-label{font-size:7px}
+  .ann-title{font-size:20px}
+  .ann-desc{font-size:14px}
+  .ann-highlight{font-size:13px;padding:10px 12px}
+  .sum-card__val{font-size:28px}
+  .dm-hdr__title{font-size:16px}
+}
+
+/* ═══ ENLARGED INTERACTIVE TEXT ═══ */
+.ann-title{font-size:26px}
+.ann-desc{font-size:17px;line-height:1.7}
+.ann-highlight{font-size:15px;padding:12px 16px}
+.ann-step{font-size:13px;letter-spacing:3px}
+.ann-metric__val{font-size:34px}
+.dm-hdr__title{font-size:20px}
+.dm-sub{font-size:14px}
+.dm-field__input{font-size:14px;padding:14px 16px}
+.dm-field__label{font-size:11px}
+.dm-bank__name{font-size:14px;font-weight:500}
+.dm-bank__icon{width:48px;height:48px;font-size:18px}
+.dm-btn{font-size:14px;padding:12px 26px}
+.dm-success__title{font-size:20px}
+.dm-success__sub{font-size:14px}
+.dm-success__row{font-size:13px}
+.po-tbl{font-size:14px}
+.po-badge{font-size:11px;padding:4px 10px}
+.po-col--sum{flex:0 0 110px}
+.cas-block{font-size:14px;padding:14px 16px}
+.push-notif__text{font-size:16px}
+.push-notif__app{font-size:11px}
+.push-notif{padding:16px 20px}
+.wlt-row{padding:16px 20px}
+.wlt-row__name{font-size:15px}
+.wlt-row__meta{font-size:11px}
+.wlt-row__amt{font-size:20px}
+.match-block{font-size:14px;padding:14px 18px}
+.crm-status{font-size:15px;padding:12px 16px}
+.conv-row{font-size:14px;padding:10px 14px}
+.sum-card__val{font-size:36px}
+.sum-card__label{font-size:12px;letter-spacing:1.5px}
+.sum-card{padding:18px}
+.bal-tick__val{font-size:34px}
+.bal-tick__cur{font-size:14px}
+.bal-tick__delta{font-size:14px}
+.transfer-bar{height:6px;margin:12px 0}
+
+/* ═══ SERVER MOCK — STATUS BAR ═══ */
+.cine-server-bar{display:flex;align-items:center;gap:10px;padding:10px 20px;background:rgba(0,255,136,.03);border-bottom:1px solid rgba(0,255,136,.08);font-family:var(--mono);font-size:11px;color:var(--t3);flex-shrink:0;overflow:hidden;white-space:nowrap}
+.srv-led{width:7px;height:7px;border-radius:50%;background:var(--g);box-shadow:0 0 8px var(--g-glow),0 0 2px var(--g);animation:srvPulse 2s ease infinite;flex-shrink:0}
+@keyframes srvPulse{0%,100%{opacity:1;box-shadow:0 0 8px var(--g-glow)}50%{opacity:.6;box-shadow:0 0 4px var(--g-glow)}}
+.srv-host{color:var(--g);font-weight:600;letter-spacing:.5px}
+.srv-ver{color:var(--t4);font-size:10px}
+.srv-sep{color:var(--t4);opacity:.4}
+.srv-status{color:var(--g);font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:1.5px}
+.srv-addr{color:var(--t4);font-size:10px}
+.srv-uptime{margin-left:auto;color:var(--cy);font-size:12px;font-weight:600;letter-spacing:1px;font-variant-numeric:tabular-nums}
+
+/* ═══ SERVER MOCK — METRICS FOOTER ═══ */
+.cine-metrics{display:flex;align-items:center;justify-content:space-around;padding:10px 20px;background:rgba(0,0,0,.3);border-top:1px solid rgba(255,255,255,.04);flex-shrink:0;overflow:hidden}
+.cm-item{display:flex;align-items:center;gap:6px}
+.cm-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t4)}
+.cm-val{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--g);font-variant-numeric:tabular-nums;transition:color .3s}
+.cm-val.hot{color:var(--am)}
+/* ═══ DASHBOARD SIDEBAR (mimics real admin panel) ═══ */
+.cine-sidebar{position:absolute;left:0;top:0;bottom:0;width:52px;background:rgba(0,0,0,.35);border-right:1px solid rgba(255,255,255,.04);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:4px;z-index:10}
+.cs-logo{width:24px;height:24px;margin-bottom:10px;color:var(--g);opacity:.8}
+.cs-sep{width:24px;height:1px;background:rgba(255,255,255,.06);margin:6px 0}
+.cs-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--t4);cursor:pointer;transition:all .25s var(--ease)}
+.cs-icon svg{width:16px;height:16px}
+.cs-icon.active{background:rgba(0,255,136,.08);color:var(--g)}
+.cs-icon:hover{color:var(--t2);background:rgba(255,255,255,.03)}
+
+/* ═══ DASHBOARD TOPBAR (live stats) ═══ */
+.cine-topbar{position:absolute;top:0;left:52px;right:0;height:48px;background:rgba(0,0,0,.25);border-bottom:1px solid rgba(255,255,255,.04);display:flex;align-items:center;padding:0 18px;gap:14px;z-index:10;overflow:hidden}
+.ct-stat{display:flex;align-items:baseline;gap:5px}
+.ct-val{font-family:var(--mono);font-size:15px;font-weight:700;color:var(--t1)}
+.ct-label{font-family:var(--mono);font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--t4)}
+.ct-sep{width:1px;height:22px;background:rgba(255,255,255,.06);flex-shrink:0}
+.ct-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:4px;font-family:var(--mono);font-size:10px;font-weight:600}
+.ct-badge--ok{background:rgba(0,255,136,.08);color:var(--g)}
+.ct-badge--warn{background:rgba(255,170,0,.08);color:var(--am)}
+
+@media(max-width:800px){
+  .cine-server-bar{font-size:9px;padding:8px 12px;gap:6px}
+  .cine-metrics{flex-wrap:wrap;gap:8px;justify-content:center}
+  .cm-item{flex:0 0 auto}
+  .cine-sidebar{display:none}
+  .cine-topbar{left:0}
+  .sc-layer{left:0!important}
+}
+</style>
+
+    <div class="cine r d2" id="cineFrame">
+      <!-- SERVER STATUS BAR -->
+      <div class="cine-server-bar">
+        <span class="srv-led"></span>
+        <span class="srv-host">RAPIDOLAR SERVER</span>
+        <span class="srv-ver">v2.4.1</span>
+        <span class="srv-sep">·</span>
+        <span class="srv-status">ONLINE</span>
+        <span class="srv-sep">·</span>
+        <span class="srv-addr">0.0.0.0:8443</span>
+        <span class="srv-uptime" id="srvUptime">00:00:00</span>
+      </div>
+      <!-- TABS -->
+      <div class="cine-tabs">
+        <div class="cine-tab on" data-sc="0"><span class="cine-tab__num">1</span><span class="tab-label">Кошелёк</span></div>
+        <div class="cine-tab" data-sc="1"><span class="cine-tab__num">2</span><span class="tab-label">Выплата</span></div>
+        <div class="cine-tab" data-sc="2"><span class="cine-tab__num">3</span><span class="tab-label">Приём</span></div>
+      </div>
+
+      <!-- STAGE -->
+      <div class="cine-stage">
+        <!-- LEFT — visual demo area -->
+        <div class="cine-left" id="cineLeft">
+          <!-- Dashboard sidebar (mimics real admin panel) -->
+          <div class="cine-sidebar">
+            <svg class="cs-logo" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" fill="currentColor"/><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3"/></svg>
+            <div class="cs-sep"></div>
+            <div class="cs-icon active" id="csWallet" title="Кошельки"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="14" r="1.5"/></svg></div>
+            <div class="cs-icon" id="csPayout" title="Выплаты"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2v20M17 7l-5-5-5 5M7 17l5 5 5-5"/></svg></div>
+            <div class="cs-icon" id="csPayin" title="Транзакции"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+            <div class="cs-sep"></div>
+            <div class="cs-icon" title="Метрики"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 20V10M18 20V4M6 20v-4"/></svg></div>
+            <div class="cs-icon" title="Настройки" style="margin-top:auto"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+          </div>
+          <!-- Dashboard topbar (live stats) -->
+          <div class="cine-topbar" id="cineTopbar">
+            <div class="ct-stat"><span class="ct-val" style="color:var(--g)">6</span><span class="ct-label">/12 активно</span></div>
+            <div class="ct-sep"></div>
+            <div class="ct-stat"><span class="ct-val">2,3M</span><span class="ct-label">ARS</span></div>
+            <div class="ct-sep"></div>
+            <div class="ct-stat"><span class="ct-val">128</span><span class="ct-label">перев.</span></div>
+            <div class="ct-sep"></div>
+            <div class="ct-badge ct-badge--ok">● Стабильно</div>
+          </div>
+          <!-- Fake cursor -->
+          <svg class="fcursor" id="fcursor" viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-3 6z" fill="#fff" stroke="#000" stroke-width="1"/></svg>
+
+          <!-- SCENARIO 0: Wallet Creation -->
+          <div class="sc-layer on" id="sc0"></div>
+          <!-- SCENARIO 1: Payout -->
+          <div class="sc-layer" id="sc1"></div>
+          <!-- SCENARIO 2: Payin -->
+          <div class="sc-layer" id="sc2"></div>
+        </div>
+
+        <!-- RIGHT — annotations -->
+        <div class="cine-right" id="cineRight">
+          <div class="ann-layer on" id="ann0"></div>
+          <div class="ann-layer" id="ann1"></div>
+          <div class="ann-layer" id="ann2"></div>
+        </div>
+      </div>
+      <!-- METRICS FOOTER -->
+      <div class="cine-metrics" id="cineMetrics">
+        <div class="cm-item"><span class="cm-label">REQ/S</span><span class="cm-val" id="cmReqs">847</span></div>
+        <div class="cm-item"><span class="cm-label">LATENCY</span><span class="cm-val" id="cmLat">12ms</span></div>
+        <div class="cm-item"><span class="cm-label">WALLETS</span><span class="cm-val" id="cmWlt">4/6</span></div>
+        <div class="cm-item"><span class="cm-label">QUEUE</span><span class="cm-val" id="cmQueue">3</span></div>
+        <div class="cm-item"><span class="cm-label">CPU</span><span class="cm-val" id="cmCpu">34%</span></div>
+        <div class="cm-item"><span class="cm-label">MEM</span><span class="cm-val" id="cmMem">1.2G</span></div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+var started=false,timer=null,autoTimer=null;
+var curSc=0,curStep=0;
+var cursor=document.getElementById('fcursor');
+
+/* ═══ SCENARIO DATA ═══ */
+var scenarios=[
+  /* SC0: WALLET CREATION */
+  {name:'Кошелёк',steps:[
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="dm"><div class="dm-hdr"><div class="dm-hdr__icon" style="background:rgba(0,255,136,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="1.5" width="14" height="14"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="17" cy="14" r="1.5"/></svg></div><div class="dm-hdr__title">Добавить кошелёк</div><div class="dm-hdr__x"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div></div><div class="dm-body"><div class="dm-sub">Выберите банк для добавления</div><div class="dm-banks"><div class="dm-bank" id="bankClaro"><div class="dm-bank__icon" style="background:linear-gradient(135deg,#e74c3c,#c0392b)">C</div><div class="dm-bank__name">Claro Pay</div></div><div class="dm-bank" id="bankPP"><div class="dm-bank__icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe)">P</div><div class="dm-bank__name">Personal Pay</div></div></div></div></div>';
+       setTimeout(function(){moveCursor(el.querySelector('#bankPP'),function(){el.querySelector('#bankPP').classList.add('hovered');clickCursor()})},800);
+     },
+     ann:{step:'Шаг 1 из 5',icon:'<svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/></svg>',title:'Выбор банка',desc:'Оператор выбирает банковскую платформу для подключения нового кошелька к каскаду.',hl:'Поддерживаются Claro Pay и Personal Pay'}
+    },
+    {dur:4000,
+     buildLeft:function(el){
+       el.innerHTML='<div class="dm"><div class="dm-hdr"><div class="dm-hdr__icon" style="background:linear-gradient(135deg,#6c5ce7,#a29bfe)"><span style="color:#fff;font-size:11px;font-weight:700">P</span></div><div class="dm-hdr__title">Personal Pay</div><div class="dm-hdr__x"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div></div><div class="dm-body"><div class="dm-sub">Введите данные аккаунта Personal Pay</div><div class="dm-field"><span class="dm-field__label">Email Personal Pay (Gmail)</span><input class="dm-field__input" id="fEmail" readonly placeholder="email@gmail.com"></div><div class="dm-field"><span class="dm-field__label">Прокси (socks5)</span><input class="dm-field__input" id="fProxy" readonly placeholder="socks5://host:port"></div><div class="dm-field"><span class="dm-field__label">Email App Password</span><input class="dm-field__input" id="fPass" readonly placeholder="xxxx xxxx xxxx xxxx"></div><div class="dm-actions"><button class="dm-btn dm-btn--ghost">Назад</button><button class="dm-btn dm-btn--primary" id="fSubmit" style="opacity:.5">Отправить ссылку</button></div></div></div>';
+       typeField('fEmail','operator.silva@gmail.com',200,function(){
+         typeField('fProxy','socks5://user:pass@195.230.105.17:10800',100,function(){
+           typeField('fPass','dkji wqpo lfmx yyyy',120,function(){
+             var btn=document.getElementById('fSubmit');
+             if(btn){btn.style.opacity='1';btn.classList.add('pulse');
+               moveCursor(btn,function(){clickCursor()})}
+           })
+         })
+       });
+     },
+     ann:{step:'Шаг 2 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 15V3m0 12l-4-4m4 4l4-4"/><path d="M2 17l.621 2.485A2 2 0 004.561 21h14.878a2 2 0 001.94-1.515L22 17"/></svg>',title:'Учётные данные',desc:'Система получает реквизиты для автоматического подключения к банковскому API. Все данные шифруются.',hl:'Подключение через защищённый прокси'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="dm"><div class="dm-hdr"><div class="dm-hdr__icon" style="background:rgba(6,182,212,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cy)" stroke-width="1.5" width="14" height="14"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div><div class="dm-hdr__title">Вставьте ссылку</div><div class="dm-hdr__x"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div></div><div class="dm-body"><div class="dm-sub">Ссылка авторизации из письма банка</div><div class="dm-field"><input class="dm-field__input" id="fLink" readonly placeholder="https://..."></div><div class="dm-actions"><button class="dm-btn dm-btn--primary" id="fLogin" style="opacity:.5"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg> Войти</button></div></div></div>';
+       typeField('fLink','https://www.personalpay.com.ar/deep/link?t=a8f3...',80,function(){
+         var btn=document.getElementById('fLogin');
+         if(btn){btn.style.opacity='1';btn.classList.add('pulse');
+           moveCursor(btn,function(){clickCursor()})}
+       });
+     },
+     ann:{step:'Шаг 3 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>',title:'Авторизация',desc:'Банк отправляет защищённую ссылку на email. Система автоматически перехватывает и использует её.',hl:'Двухфакторная верификация через email'}
+    },
+    {dur:3500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="dm"><div class="dm-hdr"><div class="dm-hdr__icon" style="background:rgba(0,255,136,.15)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--g)" stroke-width="1.5" width="14" height="14"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><div class="dm-hdr__title">Успешно!</div><div class="dm-hdr__x"><svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12"/></svg></div></div><div class="dm-body"><div class="dm-success"><svg class="dm-check" viewBox="0 0 56 56"><circle class="dm-check__circle" cx="28" cy="28" r="24"/><polyline class="dm-check__tick" points="18 28 25 35 38 22"/><circle class="dm-check__glow" cx="28" cy="28" r="26"/></svg><div class="dm-success__title">Personal Pay аккаунт добавлен</div><div class="dm-success__sub">Кошелёк готов к работе в каскаде</div><div class="dm-success__row"><span class="dm-success__label">CVU</span><span class="dm-success__val">0000076540013178842</span></div><div class="dm-success__row"><span class="dm-success__label">Статус</span><span class="dm-success__badge"><span style="width:5px;height:5px;border-radius:50%;background:var(--g);display:inline-block;box-shadow:0 0 6px var(--g-glow)"></span> Подключён</span></div></div><div class="dm-actions"><button class="dm-btn dm-btn--primary">Готово</button></div></div></div>';
+     },
+     ann:{step:'Шаг 4 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',title:'Кошелёк привязан',desc:'CVU-номер получен и зарегистрирован. Кошелёк готов принимать входящие платежи от клиентов.',hl:'CVU активен для приёма платежей'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="wlt-row"><div class="wlt-row__gauge"><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="15.9" fill="none" stroke="rgba(255,255,255,.04)" stroke-width="2.5"/><circle cx="18" cy="18" r="15.9" fill="none" stroke="var(--g)" stroke-width="2.5" stroke-dasharray="0 100" stroke-linecap="round" id="gaugeArc"/></svg><div class="wlt-row__gauge__val" id="gaugeVal">0%</div></div><div class="wlt-row__info"><div class="wlt-row__name">SILVA FERNANDO DAMIAN</div><div class="wlt-row__meta">CVU · Personal Pay · Активен</div></div><div class="wlt-row__amt" id="wltAmt">0 ₳</div><div class="wlt-row__status"></div></div>';
+       setTimeout(function(){
+         var arc=document.getElementById('gaugeArc'),val=document.getElementById('gaugeVal'),amt=document.getElementById('wltAmt');
+         if(arc){arc.setAttribute('stroke-dasharray','72 28')}
+         if(val){val.textContent='72%'}
+         if(amt){amt.textContent='365 200 ₳'}
+       },400);
+     },
+     ann:{step:'Шаг 5 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',title:'В каскаде',desc:'Кошелёк активен и автоматически участвует в распределении нагрузки между всеми кошельками системы.',hl:'Автоматическая балансировка нагрузки'}
+    }
+  ]},
+
+  /* SC1: PAYOUT */
+  {name:'Выплата',steps:[
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="po-tbl"><div class="po-tbl__hdr"><span class="po-col po-col--sum">Сумма</span><span class="po-col po-col--who">Получатель</span><span class="po-col po-col--status">Статус</span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">12 800 ARS</span><span class="po-col po-col--who">maria.lopez.07</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">8 500 ARS</span><span class="po-col po-col--who">diego.silva.02</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row highlight" id="poNew"><span class="po-col po-col--sum" style="color:var(--am)">45 230 ARS</span><span class="po-col po-col--who">carlos.garcia.03</span><span class="po-col po-col--status"><span class="po-badge po-badge--wait">⏳ Новая</span></span></div></div>';
+     },
+     ann:{step:'Шаг 1 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 2l-4 7h8l-4-7z"/><path d="M12 22l4-7H8l4 7z"/></svg>',title:'Новая заявка',desc:'Платформа 1X отправляет заявку на выплату через API. Система мгновенно принимает её в обработку.',hl:'Заявка: 45 230 ARS → carlos.garcia.03'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="po-tbl"><div class="po-tbl__hdr"><span class="po-col po-col--sum">Сумма</span><span class="po-col po-col--who">Получатель</span><span class="po-col po-col--status">Статус</span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">12 800 ARS</span><span class="po-col po-col--who">maria.lopez.07</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">8 500 ARS</span><span class="po-col po-col--who">diego.silva.02</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row"><span class="po-col po-col--sum" style="color:var(--cy)">45 230 ARS</span><span class="po-col po-col--who">carlos.garcia.03</span><span class="po-col po-col--status"><span class="po-badge po-badge--proc"><span class="po-spin"></span>Обработка</span></span></div></div><div class="cas-block">Каскад <span class="cas-block__arrow">→</span> Personal Pay #3 (SILVA F.D.) <span class="cas-block__arrow">→</span> 365 200 ARS <span class="cas-block__ok">✓</span></div>';
+     },
+     ann:{step:'Шаг 2 из 5',icon:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 12l-4-4-4 4"/><path d="M12 16V8"/></svg>',title:'Выбор кошелька',desc:'Каскад анализирует баланс, лимиты и кулдаун каждого кошелька и выбирает оптимальный для выплаты.',hl:'Автоматическая каскадная маршрутизация'}
+    },
+    {dur:3500,
+     buildLeft:function(el){
+       el.innerHTML='<div style="width:100%;max-width:440px"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px"><div><div style="font-family:var(--mono);font-size:9px;color:var(--t4)">Кошелёк</div><div style="font-family:var(--mono);font-size:12px;color:var(--cy);font-weight:600">SILVA F.D.</div></div><div style="font-family:var(--mono);font-size:18px;color:var(--t4)">→</div><div style="text-align:right"><div style="font-family:var(--mono);font-size:9px;color:var(--t4)">Получатель</div><div style="font-family:var(--mono);font-size:12px;color:var(--am);font-weight:600">carlos.garcia</div></div></div><div class="transfer-bar"><div class="transfer-fill" id="tfill"></div></div><div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px"><span style="color:var(--t3)" id="balFrom">365 200 ARS</span><span style="color:var(--am)">45 230 ARS</span></div></div>';
+       setTimeout(function(){var f=document.getElementById('tfill');if(f)f.classList.add('go')},200);
+       setTimeout(function(){var b=document.getElementById('balFrom');if(b)b.textContent='319 970 ARS'},2600);
+     },
+     ann:{step:'Шаг 3 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>',title:'Перевод средств',desc:'Банковское API выполняет перевод на CBU получателя. Баланс кошелька обновляется в реальном времени.',hl:'Время перевода: <30 секунд'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="po-tbl"><div class="po-tbl__hdr"><span class="po-col po-col--sum">Сумма</span><span class="po-col po-col--who">Получатель</span><span class="po-col po-col--status">Статус</span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">12 800 ARS</span><span class="po-col po-col--who">maria.lopez.07</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row" style="opacity:.3"><span class="po-col po-col--sum">8 500 ARS</span><span class="po-col po-col--who">diego.silva.02</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Готово</span></span></div><div class="po-row success"><span class="po-col po-col--sum" style="color:var(--g)">45 230 ARS</span><span class="po-col po-col--who">carlos.garcia.03</span><span class="po-col po-col--status"><span class="po-badge po-badge--done">✓ Завершено</span></span></div></div>';
+     },
+     ann:{step:'Шаг 4 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',title:'Подтверждение',desc:'Выплата завершена. CRM платформы автоматически обновлена — статус заявки изменён на «Выполнено».',hl:'CRM обновлена автоматически'}
+    },
+    {dur:3000,
+     buildLeft:function(el){
+       el.innerHTML='<div class="sum-grid"><div class="sum-card" style="animation-delay:0s"><div class="sum-card__val">18с</div><div class="sum-card__label">Время</div></div><div class="sum-card" style="animation-delay:.1s"><div class="sum-card__val">0%</div><div class="sum-card__label">Комиссия</div></div><div class="sum-card" style="animation-delay:.2s"><div class="sum-card__val" style="color:var(--cy)">Авто</div><div class="sum-card__label">Оператор</div></div></div>';
+     },
+     ann:{step:'Шаг 5 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>',title:'Результат',desc:'Полная автоматизация: от получения заявки до подтверждения — без единого ручного действия оператора.',hl:'100% автоматизация выплат'}
+    }
+  ]},
+
+  /* SC2: PAYIN */
+  {name:'Приём',steps:[
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div class="push-notif"><div class="push-notif__icon">P</div><div class="push-notif__body"><div class="push-notif__app">Personal Pay · Push</div><div class="push-notif__text">Recibiste <b style="color:var(--g)">$85,000</b> de Juan Perez</div></div></div>';
+     },
+     ann:{step:'Шаг 1 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>',title:'Push-уведомление',desc:'Банковское приложение на телефоне получает push о входящем переводе. Система перехватывает его мгновенно.',hl:'Перехват push за <1 секунду'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div style="width:100%;max-width:320px"><div class="push-notif" style="opacity:.5;transform:scale(.95)"><div class="push-notif__icon">P</div><div class="push-notif__body"><div class="push-notif__app">Personal Pay</div><div class="push-notif__text">Recibiste $85,000 de Juan Perez</div></div></div><div class="match-block"><span style="color:var(--t4)">Заявка #4821</span> <span class="cas-block__arrow">→</span> <span style="color:var(--t1)">85 000 ARS</span> <span class="cas-block__arrow">→</span> <span style="color:var(--cy)">juan.perez.11</span> <span class="match-block__ok">✓ СОВПАДЕНИЕ</span></div></div>';
+     },
+     ann:{step:'Шаг 2 из 5',icon:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>',title:'Матчинг заявки',desc:'Система сопоставляет сумму и отправителя с открытыми заявками на приём. Совпадение найдено автоматически.',hl:'Точность матчинга: 99.7%'}
+    },
+    {dur:2500,
+     buildLeft:function(el){
+       el.innerHTML='<div style="width:100%;max-width:300px;display:flex;flex-direction:column;align-items:center;gap:6px"><div class="crm-status crm-status--pending">⏳ Ожидание подтверждения</div><div class="crm-arrow">↓</div><div class="crm-status crm-status--done" style="animation-delay:.4s">✓ Подтверждено</div></div>';
+     },
+     ann:{step:'Шаг 3 из 5',icon:'<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>',title:'Обновление CRM',desc:'Статус заявки в CRM платформы автоматически меняется на «Подтверждено». Клиент получает уведомление.',hl:'Клиент видит подтверждение мгновенно'}
+    },
+    {dur:3000,
+     buildLeft:function(el){
+       el.innerHTML='<div style="width:100%;max-width:300px"><div class="bal-tick"><span class="bal-tick__val" id="balTick">2 866</span><span class="bal-tick__cur">USDT</span><span class="bal-tick__delta" id="balDelta"></span></div><div class="conv-row" style="margin-top:12px"><b>85 000 ARS</b> = <b style="color:var(--g)">66,25 USDT</b> @ 1 283</div></div>';
+       var v=2866,target=2932;
+       var el2=document.getElementById('balTick'),del=document.getElementById('balDelta');
+       var iv=setInterval(function(){v+=Math.ceil((target-v)/6);if(v>=target){v=target;clearInterval(iv);if(del)del.textContent='+66,25'}if(el2)el2.textContent=v.toLocaleString('ru-RU')},200);
+     },
+     ann:{step:'Шаг 4 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>',title:'Конверсия баланса',desc:'Баланс пересчитывается по актуальному курсу ARS/USDT. Все расчёты в реальном времени.',hl:'Курс обновляется каждые 60 секунд'}
+    },
+    {dur:3000,
+     buildLeft:function(el){
+       el.innerHTML='<div class="sum-grid"><div class="sum-card" style="animation-delay:0s"><div class="sum-card__val">4с</div><div class="sum-card__label">Обработка</div></div><div class="sum-card" style="animation-delay:.1s"><div class="sum-card__val">99.7%</div><div class="sum-card__label">Точность</div></div><div class="sum-card" style="animation-delay:.2s"><div class="sum-card__val" style="color:var(--cy)">851</div><div class="sum-card__label">Сегодня</div></div></div>';
+     },
+     ann:{step:'Шаг 5 из 5',icon:'<svg viewBox="0 0 24 24"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>',title:'Итог операции',desc:'Полная автоматизация приёма платежей — от push-уведомления до подтверждения клиенту. 24/7 без перерывов.',hl:'Работает автономно 24/7'}
+    }
+  ]}
+];
+
+/* ═══ HELPERS ═══ */
+function typeField(id,text,delay,cb){
+  var el=document.getElementById(id);if(!el){if(cb)cb();return}
+  el.classList.add('typing');var i=0;
+  var iv=setInterval(function(){
+    i++;el.value=text.substring(0,i);
+    if(i>=text.length){clearInterval(iv);el.classList.remove('typing');if(cb)setTimeout(cb,200)}
+  },delay);
+}
+
+function moveCursor(target,cb){
+  if(!cursor||!target)return;
+  var r=target.getBoundingClientRect();
+  var p=cursor.parentElement.getBoundingClientRect();
+  cursor.style.left=(r.left-p.left+r.width/2)+'px';
+  cursor.style.top=(r.top-p.top+r.height/2)+'px';
+  cursor.classList.add('vis');
+  if(cb)setTimeout(cb,500);
+}
+
+function clickCursor(){
+  if(cursor)cursor.classList.add('click');
+  setTimeout(function(){if(cursor)cursor.classList.remove('click')},300);
+}
+
+function hideCursor(){if(cursor)cursor.classList.remove('vis')}
+
+/* ═══ BUILD ANNOTATION ═══ */
+function buildAnn(annEl,data,stepIdx,totalSteps){
+  var dots='';
+  for(var i=0;i<totalSteps;i++){
+    var cls=i<stepIdx?'ann-dot done':i===stepIdx?'ann-dot active':'ann-dot';
+    dots+='<span class="'+cls+'"></span>';
+  }
+  annEl.innerHTML='<div class="ann-icon">'+data.icon+'</div><div class="ann-step">'+data.step+'</div><div class="ann-title">'+data.title+'</div><div class="ann-desc">'+data.desc+'</div><div class="ann-highlight">'+data.hl+'</div><div style="flex:1"></div><div class="ann-dots">'+dots+'<span class="ann-dots__text">'+(stepIdx+1)+' / '+totalSteps+'</span></div>';
+}
+
+/* ═══ PLAY STEP ═══ */
+function playStep(){
+  var sc=scenarios[curSc];
+  if(!sc)return;
+  var step=sc.steps[curStep];
+  if(!step)return;
+  var leftEl=document.getElementById('sc'+curSc);
+  var annEl=document.getElementById('ann'+curSc);
+
+  hideCursor();
+  step.buildLeft(leftEl);
+  buildAnn(annEl,step.ann,curStep,sc.steps.length);
+
+  timer=setTimeout(function(){
+    curStep++;
+    if(curStep>=sc.steps.length){
+      curStep=0;
+      /* auto-advance to next scenario */
+      setTimeout(function(){switchScenario((curSc+1)%scenarios.length)},800);
+    }else{
+      playStep();
+    }
+  },step.dur);
+}
+
+/* ═══ SWITCH SCENARIO ═══ */
+var topbarData=[
+  '<div class="ct-stat"><span class="ct-val" style="color:var(--g)">6</span><span class="ct-label">/12 активно</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">2,3M</span><span class="ct-label">ARS баланс</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">128</span><span class="ct-label">перев.</span></div><div class="ct-sep"></div><div class="ct-badge ct-badge--ok">\u25CF Стабильно</div>',
+  '<div class="ct-stat"><span class="ct-val" style="color:var(--am)">3</span><span class="ct-label">в обработке</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">45,2K</span><span class="ct-label">ARS очередь</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">12</span><span class="ct-label">выплат</span></div><div class="ct-sep"></div><div class="ct-badge ct-badge--ok">\u25CF Автоматика</div>',
+  '<div class="ct-stat"><span class="ct-val" style="color:var(--cy)">851</span><span class="ct-label">входящих</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">99,7%</span><span class="ct-label">матчинг</span></div><div class="ct-sep"></div><div class="ct-stat"><span class="ct-val">4с</span><span class="ct-label">среднее</span></div><div class="ct-sep"></div><div class="ct-badge ct-badge--ok">\u25CF Мониторинг</div>'
+];
+var sidebarIcons=[document.getElementById('csWallet'),document.getElementById('csPayout'),document.getElementById('csPayin')];
+var topbarEl=document.getElementById('cineTopbar');
+
+function switchScenario(idx){
+  clearTimeout(timer);
+  curSc=idx;curStep=0;
+  hideCursor();
+
+  document.querySelectorAll('.cine-tab').forEach(function(t,i){t.classList.toggle('on',i===idx)});
+  document.querySelectorAll('.sc-layer').forEach(function(l,i){l.classList.toggle('on',i===idx);if(i!==idx)l.innerHTML=''});
+  document.querySelectorAll('.ann-layer').forEach(function(l,i){l.classList.toggle('on',i===idx);if(i!==idx)l.innerHTML=''});
+
+  /* sync sidebar */
+  sidebarIcons.forEach(function(ic,i){if(ic)ic.classList.toggle('active',i===idx)});
+  /* sync topbar */
+  if(topbarEl)topbarEl.innerHTML=topbarData[idx]||topbarData[0];
+
+  setTimeout(playStep,300);
+}
+
+/* ═══ TAB CLICKS ═══ */
+document.querySelectorAll('.cine-tab').forEach(function(tab){
+  tab.addEventListener('click',function(){
+    switchScenario(parseInt(tab.dataset.sc));
+  });
+});
+
+/* ═══ 3D TILT ═══ */
+var frame=document.getElementById('cineFrame');
+if(frame){
+  frame.addEventListener('mousemove',function(e){
+    var r=frame.getBoundingClientRect();
+    var x=(e.clientX-r.left)/r.width-.5;
+    var y=(e.clientY-r.top)/r.height-.5;
+    frame.style.transform='perspective(1200px) rotateY('+x*2+'deg) rotateX('+(-y*1.5)+'deg)';
+  });
+  frame.addEventListener('mouseleave',function(){
+    frame.style.transform='perspective(1200px) rotateY(0) rotateX(0)';
+  });
+}
+
+/* ═══ START ON SCROLL ═══ */
+function startCinema(){
+  if(started)return;started=true;
+  switchScenario(0);
+}
+
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting)startCinema()});
+},{threshold:.15});
+if(frame)obs.observe(frame);
+
+})();
+</script>
+<script>
+/* ═══ SERVER METRICS ANIMATION ═══ */
+(function(){
+  var upEl=document.getElementById('srvUptime');
+  var reqs=document.getElementById('cmReqs');
+  var lat=document.getElementById('cmLat');
+  var queue=document.getElementById('cmQueue');
+  var cpu=document.getElementById('cmCpu');
+  var mem=document.getElementById('cmMem');
+  if(!upEl)return;
+
+  var sec=3847; /* fake uptime offset */
+  setInterval(function(){
+    sec++;
+    var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;
+    upEl.textContent=(h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s;
+  },1000);
+
+  setInterval(function(){
+    if(reqs)reqs.textContent=Math.floor(800+Math.random()*200);
+    if(lat){var v=Math.floor(8+Math.random()*12);lat.textContent=v+'ms';lat.classList.toggle('hot',v>16)}
+    if(queue)queue.textContent=Math.floor(Math.random()*8);
+    if(cpu){var c=Math.floor(25+Math.random()*25);cpu.textContent=c+'%';cpu.classList.toggle('hot',c>45)}
+    if(mem)mem.textContent=(1.0+Math.random()*0.5).toFixed(1)+'G';
+  },2000);
+})();
+</script>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     08 · LOYALTY MATH
+     ═══════════════════════════════════════════════ -->
+<section class="s s--col" id="s8">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-s8-data.mp4"></video></div>
+  <div class="inner" style="text-align:center;max-width:940px">
+    <div class="label r">08 · На пальцах и цифрах</div>
+    <h2 class="r d1">Математика лояльности</h2>
+    <p class="desc r d2" style="text-align:center;margin:0 auto clamp(10px,1.5vh,16px);color:var(--t3)">Почему ваши клиенты и деньги остаются с вами?</p>
+    <div class="roi-wrap r d3">
+      <div class="roi-input"><label>Транзакций/мес:</label><input type="number" id="roi-v" value="50000" min="1000" max="1000000" oninput="uROI()"></div>
+      <div class="roi-grid" id="roi-g"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     09 · CTA
+     ═══════════════════════════════════════════════ -->
+<section class="s s--col" id="s9">
+  <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-s9-handshake.mp4"></video></div>
+  <div class="inner" style="text-align:center;max-width:700px">
+    <div class="label r">Следующий шаг</div>
+    <h2 class="r d1">Покажем на вашем<br>кейсе</h2>
+    <p class="desc r d2" style="text-align:center;margin:0 auto clamp(16px,3vh,28px);color:var(--t3)">Берём ваш типовой сценарий: статусы, правила, лимиты, исключения.<br>Показываем, как ложится в систему. Запускаем пилот. 2 недели — вы видите результат.</p>
+    <div class="cta-wrap r d3">
+      <div class="cta-glow"></div>
+      <a href="#" class="cta-btn" id="cta">Назначить демо-звонок</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     10 · APPENDIX (free-scroll)
+     ═══════════════════════════════════════════════ -->
+<section class="s s--free" id="s10" style="padding:clamp(48px,6vh,80px) 0">
+  <div class="inner" style="max-width:1000px">
+    <div class="label r">Техническая база</div>
+    <h2 class="r d1" style="font-size:clamp(20px,2.5vw,30px)">Факты и доказательства</h2>
+    <div class="cl-wrap r d2" style="margin-top:20px">
+      <table class="cl-t">
+        <thead><tr><th>Утверждение</th><th>Доказательство</th><th>Исходник</th></tr></thead>
+        <tbody>
+          <tr><td>Трёхуровневая архитектура</td><td>UI + API-перехват + аналитика/OCR</td><td><code>automation_engine</code></td></tr>
+          <tr><td>Graph-based навигация</td><td>SQLite граф, веса по success rate</td><td><code>graph_planner.py:176</code></td></tr>
+          <tr><td>YOLO + OCR верификация</td><td>Распознавание экрана в реальном времени</td><td><code>vision_module</code></td></tr>
+          <tr><td>14 типов действий</td><td>Sealed class, 0 хардкод координат</td><td><code>ActionTemplate.kt:23</code></td></tr>
+          <tr><td>Цифровой отпечаток шага</td><td>SHA-256, макс 3 попытки</td><td><code>PlanExecutor.kt:233</code></td></tr>
+          <tr><td>4-весовой скоринг</td><td>30/25/25/20% — баланс/кулдаун/лимит/успешность</td><td><code>selector.py:254</code></td></tr>
+          <tr><td>Каскад через 3 кошелька</td><td>Hard/soft отказ, автоматическая цепочка</td><td><code>cascade.py:60</code></td></tr>
+          <tr><td>Circuit breaker per wallet</td><td>CLOSED/OPEN/HALF_OPEN</td><td><code>circuit_breaker.py</code></td></tr>
+          <tr><td>Защита от дублей x3</td><td>Уникальный ключ, 3 точки проверки</td><td><code>dependencies.py:108</code></td></tr>
+          <tr><td>Crash recovery при старте</td><td>Автосканирование in-flight операций</td><td><code>onex_poll.py:1393</code></td></tr>
+          <tr><td>59 параметров realtime</td><td>Hot reload без рестарта системы</td><td><code>config.py:35</code></td></tr>
+          <tr><td>Адаптация к обновлениям банка</td><td>UI-слой адаптируется, модели продолжают работать</td><td><code>adaptive_engine</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<script>
+/* ═══════════════════════════════════════════════
+   CURSOR GLOW (lerp-smoothed)
+   ═══════════════════════════════════════════════ */
+const glow=document.getElementById('glow');
+let mx=0,my=0,gx=0,gy=0,glowRunning=false;
+function glowLoop(){
+  gx+=(mx-gx)*.08;gy+=(my-gy)*.08;
+  glow.style.left=gx+'px';glow.style.top=gy+'px';
+  if(Math.abs(mx-gx)>.5||Math.abs(my-gy)>.5){requestAnimationFrame(glowLoop)}
+  else{glowRunning=false}
+}
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;glow.classList.add('active');if(!glowRunning){glowRunning=true;glowLoop()}});
+document.addEventListener('mouseleave',()=>{glow.classList.remove('active');glowRunning=false});
+
+/* ═══════════════════════════════════════════════
+   TEXT SCRAMBLE
+   ═══════════════════════════════════════════════ */
+class Scramble{
+  constructor(el){this.el=el;this.chars='ΑΒΓΔΕΖΗΘ01▓░▒█▀▄■□♦♢◊∘';this.queue=[];this.frame=0}
+  set(t){const old=this.el.textContent;const len=Math.max(old.length,t.length);this.queue=[];for(let i=0;i<len;i++){const from=old[i]||'';const to=t[i]||'';const start=Math.floor(Math.random()*20);const end=start+Math.floor(Math.random()*20);this.queue.push({from,to,start,end,char:''})}cancelAnimationFrame(this.raf);this.frame=0;this.update()}
+  update(){let out='',done=true;for(let i=0,n=this.queue.length;i<n;i++){let{from,to,start,end,char}=this.queue[i];if(this.frame>=end){out+=to}else if(this.frame>=start){done=false;if(!char||Math.random()<.28){char=this.chars[Math.floor(Math.random()*this.chars.length)];this.queue[i].char=char}out+='<span style="color:var(--t4)">'+char+'</span>'}else{done=false;out+=from}}
+  this.el.innerHTML=out;if(!done){this.frame++;this.raf=requestAnimationFrame(()=>this.update())}}
+}
+
+/* ═══════════════════════════════════════════════
+   REVEAL OBSERVER
+   ═══════════════════════════════════════════════ */
+const robs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('v')})},{threshold:.08,rootMargin:'0px 0px -30px 0px'});
+document.querySelectorAll('.r').forEach(el=>robs.observe(el));
+
+/* Section visibility (SVG draw + video control) */
+const sobs=new IntersectionObserver(e=>{e.forEach(x=>{x.target.classList.toggle('visible',x.isIntersecting);
+  const v=x.target.querySelector('.vid-bg video');
+  if(v&&v.src){x.isIntersecting?v.play().catch(()=>{}):v.pause()}
+})},{threshold:.25});
+document.querySelectorAll('.s').forEach(s=>sobs.observe(s));
+
+/* ═══════════════════════════════════════════════
+   LAZY VIDEO LOADING
+   ═══════════════════════════════════════════════ */
+const vobs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){const v=x.target;if(v.dataset.src&&!v.getAttribute('src')){v.src=v.dataset.src;v.load();v.play().catch(()=>{});vobs.unobserve(v)}}})},{rootMargin:'400px'});
+document.querySelectorAll('video[data-src]').forEach(v=>vobs.observe(v));
+
+/* ═══════════════════════════════════════════════
+   HERO SCRAMBLE TRIGGER
+   ═══════════════════════════════════════════════ */
+const scrEl=document.getElementById('scramble');
+const scr=new Scramble(scrEl);
+const heroObs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!scrEl.dataset.done){scrEl.dataset.done='1';setTimeout(()=>scr.set('RAPIDOLAR'),400)}},{threshold:.5});
+heroObs.observe(scrEl);
+
+/* ═══════════════════════════════════════════════
+   PROGRESS BAR
+   ═══════════════════════════════════════════════ */
+const pb=document.getElementById('pbar');
+let scrollTicking=false;
+window.addEventListener('scroll',()=>{if(!scrollTicking){scrollTicking=true;requestAnimationFrame(()=>{const h=document.documentElement.scrollHeight-innerHeight;pb.style.transform='scaleX('+(h>0?scrollY/h:0)+')';scrollTicking=false})}},{passive:true});
+
+/* ═══════════════════════════════════════════════
+   NAV DOTS — ACTIVE STATE
+   ═══════════════════════════════════════════════ */
+const sections=document.querySelectorAll('.s:not(.s--free)');
+const dots=document.querySelectorAll('.nav__d');
+function goS(i){sections[i]?.scrollIntoView({behavior:'smooth'})}
+const navObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){const i=[...sections].indexOf(x.target);dots.forEach((d,j)=>d.classList.toggle('on',j===i));currentSection=i}})},{threshold:.4});
+sections.forEach(s=>navObs.observe(s));
+
+/* ═══════════════════════════════════════════════
+   PARALLAX — mesh container moves on scroll
+   ═══════════════════════════════════════════════ */
+const meshEl=document.getElementById('mesh');
+let pxTicking=false;
+window.addEventListener('scroll',()=>{
+  if(!pxTicking){pxTicking=true;requestAnimationFrame(()=>{
+    meshEl.style.transform=`translateY(${window.scrollY*-0.08}px)`;
+    pxTicking=false;
+  })}
+},{passive:true});
+
+/* ═══════════════════════════════════════════════
+   3D TILT ON BENTO CARDS
+   ═══════════════════════════════════════════════ */
+document.querySelectorAll('.bento__i').forEach(card=>{
+  card.addEventListener('mousemove',e=>{const r=card.getBoundingClientRect();const x=(e.clientX-r.left)/r.width-.5;const y=(e.clientY-r.top)/r.height-.5;card.style.transform=`perspective(800px) rotateY(${x*6}deg) rotateX(${-y*6}deg) scale(1.02)`});
+  card.addEventListener('mouseleave',()=>{card.style.transform='perspective(800px) rotateY(0) rotateX(0) scale(1)'});
+});
+
+/* ═══════════════════════════════════════════════
+   MAGNETIC CTA BUTTON
+   ═══════════════════════════════════════════════ */
+const cta=document.getElementById('cta');
+cta.addEventListener('mousemove',e=>{const r=cta.getBoundingClientRect();const x=e.clientX-r.left-r.width/2;const y=e.clientY-r.top-r.height/2;cta.style.transform=`translate(${x*.25}px,${y*.25}px)`});
+cta.addEventListener('mouseleave',()=>{cta.style.transform='translate(0,0)'});
+
+/* ═══════════════════════════════════════════════
+   RIPPLE EFFECT ON CHAOS BUTTONS
+   ═══════════════════════════════════════════════ */
+function addRipple(btn,e){
+  const r=btn.getBoundingClientRect();
+  const ripple=document.createElement('span');
+  ripple.className='ripple';
+  ripple.style.left=(e.clientX-r.left)+'px';
+  ripple.style.top=(e.clientY-r.top)+'px';
+  ripple.style.width=ripple.style.height=Math.max(r.width,r.height)+'px';
+  btn.appendChild(ripple);
+  setTimeout(()=>ripple.remove(),600);
+}
+document.querySelectorAll('.t-btn').forEach(b=>{
+  b.addEventListener('click',e=>addRipple(b,e));
+});
+
+/* ═══════════════════════════════════════════════
+   ANIMATED COUNTERS
+   ═══════════════════════════════════════════════ */
+function animC(el,tgt,dur=1200){let s=null;const step=ts=>{if(!s)s=ts;const p=Math.min((ts-s)/dur,1);const eased=1-Math.pow(1-p,3);el.textContent=Math.round(eased*tgt);if(p<1)requestAnimationFrame(step)};requestAnimationFrame(step)}
+const cntObs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting&&!x.target.dataset.done){x.target.dataset.done='1';const t=parseInt(x.target.dataset.count);if(!isNaN(t))animC(x.target,t)}})},{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cntObs.observe(el));
+
+/* ═══════════════════════════════════════════════
+   ORBIT VISUALIZATION — 5 modules around core
+   ═══════════════════════════════════════════════ */
+(function(){
+  var cvs=document.getElementById('orbit-canvas');
+  if(!cvs)return;
+  var ctx=cvs.getContext('2d'),box=document.getElementById('orbit-viz');
+  var W,H,dpr,hov=-1,running=false,angle=0,lastT=0;
+
+  var mods=[
+    {l:'Экосистема',icon:'\u2699',c:'#00d4ff',desc:'KYC \u00b7 лимиты \u00b7 кулдауны'},
+    {l:'Выплаты',icon:'\u2713',c:'#00ff88',desc:'переводы \u00b7 чеки \u00b7 подтверждения'},
+    {l:'Балансы',icon:'\u25CE',c:'#ffaa00',desc:'остатки \u00b7 сверки \u00b7 контроль'},
+    {l:'Ликвидность',icon:'\u0024',c:'#b388ff',desc:'USDT \u00b7 P2P \u00b7 авто-закупка'},
+    {l:'Поддержка',icon:'\u2709',c:'#4dd0c8',desc:'споры \u00b7 тикеты \u00b7 видео'}
+  ];
+
+  function resize(){var r=box.getBoundingClientRect();dpr=window.devicePixelRatio||1;W=r.width;H=r.height;cvs.width=W*dpr;cvs.height=H*dpr}
+  resize();window.addEventListener('resize',resize);
+
+  /* text list hover sync */
+  var lis=document.querySelectorAll('.orbit-li');
+  lis.forEach(function(li){
+    li.addEventListener('mouseenter',function(){hov=+this.dataset.orbit;lis.forEach(function(l){l.classList.remove('active')});this.classList.add('active')});
+    li.addEventListener('mouseleave',function(){hov=-1;this.classList.remove('active')});
+  });
+
+  /* canvas hover */
+  var mx=-1,my=-1;
+  cvs.addEventListener('mousemove',function(e){
+    var r=cvs.getBoundingClientRect();mx=e.clientX-r.left;my=e.clientY-r.top;
+    var old=hov;hov=hitNode(mx,my);
+    if(hov!==old){lis.forEach(function(l){l.classList.remove('active')});if(hov>=0&&lis[hov])lis[hov].classList.add('active')}
+    cvs.style.cursor=hov>=0?'pointer':'default';
+  });
+  cvs.addEventListener('mouseleave',function(){mx=my=-1;hov=-1;cvs.style.cursor='default';lis.forEach(function(l){l.classList.remove('active')})});
+  /* touch support for mobile */
+  cvs.addEventListener('touchstart',function(e){
+    var t=e.touches[0],r=cvs.getBoundingClientRect();
+    mx=t.clientX-r.left;my=t.clientY-r.top;
+    var old=hov;hov=hitNode(mx,my);
+    if(hov!==old){lis.forEach(function(l){l.classList.remove('active')});if(hov>=0&&lis[hov])lis[hov].classList.add('active')}
+    if(hov>=0)e.preventDefault();
+  },{passive:false});
+  cvs.addEventListener('touchend',function(){mx=my=-1;hov=-1;lis.forEach(function(l){l.classList.remove('active')})});
+
+  function nodePos(i,t){
+    var cx=W/2,cy=H/2,a=((Math.PI*2)/mods.length)*i+t,rx=Math.min(W,H)*0.34,ry=rx*0.38;
+    return{x:cx+Math.cos(a)*rx,y:cy+Math.sin(a)*ry};
+  }
+  function hitNode(px,py){
+    for(var i=0;i<mods.length;i++){var p=nodePos(i,angle);var dx=px-p.x,dy=py-p.y;if(dx*dx+dy*dy<1600)return i}
+    return -1;
+  }
+
+  function draw(ts){
+    if(!running)return;
+    if(W<10||H<10)resize();
+    var dt=(ts-lastT)/1000;lastT=ts;
+    angle+=dt*0.3;/* slow rotation */
+
+    ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+    var cx=W/2,cy=H/2,rx=Math.min(W,H)*0.34,ry=rx*0.38;
+
+    /* orbit track */
+    ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.06)';ctx.lineWidth=1;ctx.stroke();
+
+    /* second orbit (decorative) */
+    ctx.beginPath();ctx.ellipse(cx,cy,rx*0.6,ry*0.6,0.3,0,Math.PI*2);
+    ctx.strokeStyle='rgba(255,255,255,0.03)';ctx.stroke();
+
+    /* connection lines */
+    for(var i=0;i<mods.length;i++){
+      var p=nodePos(i,angle);
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(p.x,p.y);
+      ctx.strokeStyle=i===hov?mods[i].c+'66':'rgba(255,255,255,0.04)';ctx.lineWidth=i===hov?1.5:1;ctx.stroke();
+    }
+
+    /* center core */
+    var coreR=Math.min(W,H)*0.11;
+    var cg=ctx.createRadialGradient(cx,cy,0,cx,cy,coreR);
+    cg.addColorStop(0,'rgba(0,255,136,0.15)');cg.addColorStop(1,'rgba(0,255,136,0.01)');
+    ctx.beginPath();ctx.arc(cx,cy,coreR,0,Math.PI*2);ctx.fillStyle=cg;ctx.fill();
+    ctx.strokeStyle='rgba(0,255,136,0.2)';ctx.lineWidth=1;ctx.stroke();
+
+    /* core text */
+    ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.font='bold '+Math.round(Math.min(W,H)*0.048)+'px Space Grotesk,sans-serif';
+    ctx.fillStyle='#f0f0f5';ctx.fillText('RAPIDOLAR',cx,cy-6);
+    ctx.font=Math.round(Math.min(W,H)*0.028)+'px JetBrains Mono,monospace';
+    ctx.fillStyle='rgba(0,255,136,0.8)';ctx.fillText('100% цикл',cx,cy+18);
+
+    /* node sizes relative to canvas */
+    var base=Math.min(W,H);
+    var nodeR=Math.max(10,Math.round(base*0.055));
+    var nodeRH=Math.max(13,Math.round(base*0.075));
+    var iconSz=Math.max(8,Math.round(base*0.04));
+    var iconSzH=Math.max(10,Math.round(base*0.05));
+    var lblSz=Math.max(7,Math.round(base*0.035));
+    var lblSzH=Math.max(8,Math.round(base*0.04));
+
+    /* nodes */
+    for(var i=0;i<mods.length;i++){
+      var m=mods[i],p=nodePos(i,angle);
+      var isH=i===hov;
+      var nr=isH?nodeRH:nodeR;
+
+      /* glow */
+      if(isH){ctx.shadowColor=m.c;ctx.shadowBlur=25}
+
+      /* circle */
+      ctx.beginPath();ctx.arc(p.x,p.y,nr,0,Math.PI*2);
+      ctx.fillStyle=isH?m.c+'33':'rgba(255,255,255,0.05)';ctx.fill();
+      ctx.strokeStyle=m.c;ctx.lineWidth=isH?2.5:1.5;ctx.stroke();
+      ctx.shadowBlur=0;
+
+      /* icon */
+      ctx.font=(isH?'bold ':'')+((isH?iconSzH:iconSz))+'px sans-serif';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillStyle=m.c;ctx.fillText(m.icon,p.x,p.y);
+
+      /* label below node */
+      ctx.font=(isH?'bold '+lblSzH:lblSz)+'px JetBrains Mono,monospace';
+      ctx.fillStyle=isH?m.c:'rgba(255,255,255,0.75)';
+      ctx.fillText(m.l,p.x,p.y+nr+Math.round(base*0.04));
+
+      /* desc on hover */
+      if(isH){
+        ctx.font=Math.max(7,Math.round(base*0.03))+'px JetBrains Mono,monospace';
+        ctx.fillStyle='rgba(255,255,255,0.6)';
+        ctx.fillText(m.desc,p.x,p.y+nr+32);
+      }
+    }
+
+    ctx.restore();
+    requestAnimationFrame(draw);
+  }
+
+  var oObs=new IntersectionObserver(function(e){e.forEach(function(x){
+    if(x.isIntersecting&&!running){running=true;resize();if(W<10||H<10){setTimeout(function(){resize();lastT=performance.now();requestAnimationFrame(draw)},200)}else{lastT=performance.now();requestAnimationFrame(draw)}}
+    else if(!x.isIntersecting){running=false}
+  })},{threshold:.05});
+  oObs.observe(box);
+})();
+
+/* ═══════════════════════════════════════════════
+   TRANSACTION FLOW ANIMATION (Section 6)
+   ═══════════════════════════════════════════════ */
+(function(){
+  var flow=document.getElementById('txn-flow');
+  if(!flow)return;
+  var steps=flow.querySelectorAll('.txn-step');
+  var lines=flow.querySelectorAll('.txn-line');
+  var timer=document.getElementById('txn-timer');
+  var mSpd=document.getElementById('m-speed');
+  var mDsp=document.getElementById('m-disp');
+  var running=false,done=false;
+
+  function reset(){
+    steps.forEach(function(s){s.classList.remove('on','done')});
+    lines.forEach(function(l){l.classList.remove('done','anim')});
+    timer.classList.remove('active','done');
+    timer.innerHTML='0.0<span style="font-size:.5em;opacity:.5"> сек</span>';
+    mSpd.textContent='0';mDsp.textContent='0';
+    done=false;
+  }
+
+  function animate(){
+    if(done)return;
+    timer.classList.add('active');
+    var delays=[0,800,1600,2800,3800,4600];
+
+    /* activate steps */
+    for(var i=0;i<steps.length;i++){(function(idx){
+      setTimeout(function(){
+        if(idx>0){steps[idx-1].classList.remove('on');steps[idx-1].classList.add('done')}
+        steps[idx].classList.add('on');
+        if(idx>0){lines[idx-1].classList.add('anim');setTimeout(function(){lines[idx-1].classList.add('done')},500)}
+      },delays[idx]);
+    })(i)}
+
+    /* ALL count-ups start simultaneously */
+    var tStart=performance.now(),dur=4600;
+    function tick(){
+      var t=Math.min(1,(performance.now()-tStart)/dur);
+      timer.innerHTML=(t*30).toFixed(1)+'<span style="font-size:.5em;opacity:.5"> сек</span>';
+      mSpd.textContent=Math.round(t*30);
+      mDsp.textContent=(t*0.8).toFixed(1);
+      if(t<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    /* final state */
+    setTimeout(function(){
+      steps[steps.length-1].classList.remove('on');steps[steps.length-1].classList.add('done');
+      timer.innerHTML='30.0<span style="font-size:.5em;opacity:.5"> сек</span>';
+      timer.classList.add('done');
+      mSpd.textContent='30';mDsp.textContent='0.8';
+      done=true;
+    },dur+200);
+  }
+
+  function countUp(el,from,to,dur,dec){
+    dec=dec||0;var s=performance.now();
+    function f(){var t=Math.min(1,(performance.now()-s)/dur);var v=from+(to-from)*t;
+      el.textContent=dec?v.toFixed(dec):Math.round(v);
+      if(t<1)requestAnimationFrame(f);
+    }requestAnimationFrame(f);
+  }
+
+  var fObs=new IntersectionObserver(function(e){e.forEach(function(x){
+    if(x.isIntersecting&&!running){running=true;reset();setTimeout(animate,300)}
+    else if(!x.isIntersecting){running=false;reset()}
+  })},{threshold:.3});
+  fObs.observe(flow);
+})();
+
+/* ═══════════════════════════════════════════════
+   TIMELINE — HOW IT WORKS (3 layers)
+   ═══════════════════════════════════════════════ */
+var cs=0;
+const stxt=[
+  '<strong style="color:var(--g)">Лучший маршрут — за миллисекунды.</strong><br>10 проверок доступности, 4-весовой скоринг, budget pacing — без участия человека. Система оценивает все кошельки по балансу, кулдауну, лимиту и успешности. Лучший маршрут выбирается алгоритмом, не оператором.',
+  '<strong style="color:var(--cy)">Слой 1 — UI-автоматизация.</strong><br>Система взаимодействует с банковским приложением как пользователь: нажимает кнопки, заполняет формы, читает данные с экрана. Компьютерное зрение (YOLO) распознаёт элементы интерфейса, OCR считывает балансы и подтверждения. Работает на любом языке интерфейса, на любом устройстве. 24/7.',
+  '<strong style="color:var(--am)">Слой 2 — перехват и анализ запросов.</strong><br>Система анализирует, что происходит внутри приложения на уровне API-вызовов. Понимает логику банка: какие запросы используются для переводов, авторизации, получения баланса. Это позволяет выполнять операции напрямую, даже без полного прохождения интерфейса.',
+  '<strong style="color:var(--pu)">Слой 3 — аналитика и безопасность.</strong><br>Обрабатывает заголовки, запросы, чувствительную информацию и формирует устойчивую модель работы для каждого банка. Каждая транзакция — это данные. С каждой операцией маршрутизация становится умнее. Система не деградирует — она развивается.',
+  '<strong style="color:var(--g)">Банк обновил интерфейс? Система не ломается.</strong><br>UI-слой адаптируется к изменениям, а модели продолжают работать. Обновления приложений не останавливают автоматизацию. Это принципиальное отличие от скриптов, которые ломаются при каждом обновлении.',
+  '<strong style="color:var(--t1)">Универсальное решение.</strong><br>Масштабируется на разные банки и страны без полной переработки системы. Если автоматизация сталкивается с нестандартной ситуацией — fallback на администратора обеспечивает стабильность 24/7. Но таких случаев менее 1%.'
+];
+function setStep(n){cs=n;document.querySelectorAll('.tl-s').forEach((s,i)=>{s.classList.remove('on','done');if(i<n)s.classList.add('done');if(i===n)s.classList.add('on')});document.getElementById('tl-detail').innerHTML=stxt[n]}
+setStep(0);
+
+/* ═══════════════════════════════════════════════
+   ROI / LOYALTY CALCULATOR
+   ═══════════════════════════════════════════════ */
+function uROI(){
+  const raw=+document.getElementById('roi-v').value;const v=Math.max(1000,Math.min(isNaN(raw)?50000:raw,1000000));
+  /* disputes = v * error rate */
+  const mDisp=Math.round(v*0.07),aDisp=Math.round(v*0.008);
+  /* churn */
+  const mLost=Math.round(v*0.01),aLost=Math.max(1,Math.round(v*0.00001));
+  document.getElementById('roi-g').innerHTML=`
+<div class="roi-card roi-card--b"><div class="roi-card__tag">Стандартный процессинг (High-Risk)</div>
+<div class="roi-m"><span class="roi-m__l">Макс. транзакций/час</span><span class="roi-m__v">10,000</span></div>
+<div class="roi-m"><span class="roi-m__l">Время обработки заявки</span><span class="roi-m__v">10–15 мин</span></div>
+<div class="roi-m"><span class="roi-m__l">Ошибки / сбои</span><span class="roi-m__v">7%</span></div>
+<div class="roi-m"><span class="roi-m__l">Споры и апелляции/мес</span><span class="roi-m__v">${mDisp.toLocaleString()}</span></div>
+<div class="roi-m"><span class="roi-m__l">Время разрешения спора</span><span class="roi-m__v">2–24 ч</span></div>
+<div class="roi-m"><span class="roi-m__l">Потерянные клиенты</span><span class="roi-m__v">1–3%</span></div></div>
+<div class="roi-card roi-card--a"><div class="roi-card__tag">С RAPIDOLAR</div>
+<div class="roi-m"><span class="roi-m__l">Макс. транзакций/час</span><span class="roi-m__v">100,000</span></div>
+<div class="roi-m"><span class="roi-m__l">Время обработки заявки</span><span class="roi-m__v">< 30 сек</span></div>
+<div class="roi-m"><span class="roi-m__l">Ошибки / сбои</span><span class="roi-m__v">0.8%</span></div>
+<div class="roi-m"><span class="roi-m__l">Споры и апелляции/мес</span><span class="roi-m__v">${aDisp.toLocaleString()}</span></div>
+<div class="roi-m"><span class="roi-m__l">Время разрешения спора</span><span class="roi-m__v">< 5 мин</span></div>
+<div class="roi-m"><span class="roi-m__l">Потерянные клиенты</span><span class="roi-m__v">0.001%</span></div>
+<div class="roi-m" style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(0,255,136,.15)"><span class="roi-m__l" style="color:var(--g)">Конверсия заявок</span><span class="roi-m__v" style="color:var(--g)">75–90%</span></div></div>`}
+uROI();
+
+/* ═══════════════════════════════════════════════
+   LIGHTBOX — upgraded
+   ═══════════════════════════════════════════════ */
+function openLb(src){document.getElementById('lb-img').src=src;document.getElementById('lb').classList.add('open');document.body.style.overflow='hidden'}
+function closeLb(e){if(e&&e.target&&e.target.tagName==='IMG')return;document.getElementById('lb').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeLb();e.preventDefault()}});
+
+/* ═══════════════════════════════════════════════
+   KEYBOARD NAVIGATION
+   ═══════════════════════════════════════════════ */
+let currentSection=0;
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'||e.key===' '){e.preventDefault();currentSection=Math.min(sections.length-1,currentSection+1);goS(currentSection)}
+  if(e.key==='ArrowUp'){e.preventDefault();currentSection=Math.max(0,currentSection-1);goS(currentSection)}
+});
+
+/* ═══════════════════════════════════════════════
+   PIPE VISUALIZATION — transaction waterfall
+   ═══════════════════════════════════════════════ */
+(function(){
+  var cvs=document.getElementById('pipe-canvas');
+  if(!cvs)return;
+  var ctx=cvs.getContext('2d'),box=document.getElementById('pipe-viz');
+  var W,H,dpr,Z2=0.42,Z3=0.74;
+  var stats={ok:0,err:0,dis:0,del:0};
+  var pkts=[],frame=0,running=false;
+
+  function resize(){
+    var r=box.getBoundingClientRect();
+    dpr=window.devicePixelRatio||1;
+    W=r.width;H=r.height;
+    cvs.width=W*dpr;cvs.height=H*dpr;
+    cvs.style.width=W+'px';cvs.style.height=H+'px';
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  function Pkt(){
+    this.x=W*0.42+Math.random()*W*0.16;
+    this.y=-4-Math.random()*20;
+    this.vy=0.5+Math.random()*0.35;
+    this.sz=2.5+Math.random()*1.5;
+    this.st='ok';this.lbl='';this.a=1;this.dx=0;
+    this.decided=false;this.counted=false;
+  }
+
+  Pkt.prototype.update=function(){
+    var yf=this.y/H;
+    /* Zone 2: 80% become manual (slow, amber) */
+    if(yf>Z2&&this.st==='ok'){
+      if(Math.random()<0.2){this.st='auto';this.vy*=1.2}
+      else{this.st='manual';this.vy*=0.5;this.dx=(Math.random()-0.5)*0.3}
+    }
+    /* Zone 3: manual packets get problems */
+    if(yf>Z3&&this.st==='manual'&&!this.decided){
+      this.decided=true;var r=Math.random();
+      if(r<0.10){this.st='error';this.lbl='ошибка';this.dx=(Math.random()-0.5)*2.5;stats.err++}
+      else if(r<0.18){this.st='dispute';this.lbl='спор';this.dx=(Math.random()-0.5)*2;stats.dis++}
+      else if(r<0.28){this.st='stuck';this.lbl='задержка';this.vy=0.03;stats.del++}
+    }
+    if(yf>0.93&&!this.counted&&(this.st==='manual'||this.st==='auto')){this.counted=true;stats.ok++}
+    this.x+=this.dx;this.y+=this.vy;
+    if(this.st==='error'||this.st==='dispute')this.a-=0.005;
+    if(this.st==='stuck'&&yf>0.88)this.a-=0.008;
+    return this.y<H+10&&this.a>0;
+  };
+
+  Pkt.prototype.draw=function(){
+    ctx.globalAlpha=this.a;
+    var c={ok:'#00ff88',auto:'#00ff88',manual:'#ffaa00',error:'#ff4466',dispute:'#ff8800',stuck:'#555566'}[this.st]||'#00ff88';
+    ctx.beginPath();ctx.arc(this.x,this.y,this.sz,0,6.283);ctx.fillStyle=c;ctx.fill();
+    if(this.st==='ok'||this.st==='auto'){
+      ctx.beginPath();ctx.arc(this.x,this.y,this.sz+4,0,6.283);
+      ctx.fillStyle='rgba(0,255,136,0.08)';ctx.fill();
+    }
+    if(this.lbl){ctx.fillStyle=c;ctx.fillText(this.lbl,this.x+this.sz+4,this.y+3)}
+    ctx.globalAlpha=1;
+  };
+
+  function drawBg(){
+    ctx.strokeStyle='rgba(0,255,136,0.04)';ctx.lineWidth=1.5;ctx.setLineDash([]);
+    ctx.beginPath();ctx.moveTo(W*0.5,0);ctx.lineTo(W*0.5,H);ctx.stroke();
+    ctx.setLineDash([4,8]);ctx.strokeStyle='rgba(255,255,255,0.05)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(W*0.08,H*Z2);ctx.lineTo(W*0.92,H*Z2);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(W*0.08,H*Z3);ctx.lineTo(W*0.92,H*Z3);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font='10px JetBrains Mono,monospace';
+    ctx.fillStyle='rgba(0,255,136,0.25)';ctx.fillText('20% авто',W*0.64,H*Z2-7);
+    ctx.fillStyle='rgba(255,170,0,0.25)';ctx.fillText('80% вручную',W*0.56,H*Z2+15);
+  }
+
+  function loop(){
+    if(!running)return;
+    if(W<10||H<10)resize();
+    ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,W,H);
+    drawBg();
+    frame++;
+    if(frame%8===0&&pkts.length<80)pkts.push(new Pkt());
+    ctx.font='9px JetBrains Mono,monospace';
+    for(var i=pkts.length-1;i>=0;i--){
+      if(!pkts[i].update())pkts.splice(i,1);
+      else pkts[i].draw();
+    }
+    ctx.restore();
+    if(frame%10===0){
+      document.getElementById('ps-ok').textContent=stats.ok;
+      document.getElementById('ps-err').textContent=stats.err;
+      document.getElementById('ps-dis').textContent=stats.dis;
+      document.getElementById('ps-del').textContent=stats.del;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  var pObs=new IntersectionObserver(function(e){e.forEach(function(x){
+    if(x.isIntersecting&&!running){running=true;stats.ok=stats.err=stats.dis=stats.del=0;pkts.length=0;frame=0;resize();if(W<10||H<10){setTimeout(function(){resize();loop()},200)}else{loop()}}
+    else if(!x.isIntersecting){running=false}
+  })},{threshold:.05});
+  pObs.observe(box);
+})();
+
+/* ═══════════════════════════════════════════════
+   DONUT CHART — 15% auto vs 85% manual (interactive)
+   ═══════════════════════════════════════════════ */
+(function(){
+  var cvs=document.getElementById('donut-canvas');
+  if(!cvs)return;
+  var ctx=cvs.getContext('2d'),box=document.getElementById('donut-viz');
+  var W,H,dpr,mx=-1,my=-1,hov=-1;
+
+  function resize(){var r=box.getBoundingClientRect();dpr=window.devicePixelRatio||1;W=r.width;H=r.height;cvs.width=W*dpr;cvs.height=H*dpr}
+  resize();window.addEventListener('resize',resize);
+
+  var segs=[
+    {l:'Приём платежей',p:0.15,c:'#00ff88',auto:true},
+    {l:'Выплаты',p:0.17,c:'#ff4466',auto:false},
+    {l:'Апелляции',p:0.17,c:'#ff5544',auto:false},
+    {l:'Поддержка',p:0.17,c:'#ff7733',auto:false},
+    {l:'P2P закупки',p:0.17,c:'#ffaa00',auto:false},
+    {l:'Сбои',p:0.17,c:'#cc3344',auto:false}
+  ];
+  var prog=0,running=false,sT=null,done=false;
+
+  /* hit-test: is (px,py) inside segment i? */
+  function hitSeg(px,py){
+    var cx=W/2,cy=H*0.44,R=Math.min(W,H*0.8)*0.26,r=R*0.55;
+    var dx=px-cx,dy=py-cy,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<r||d>R+16)return -1;
+    var ang=Math.atan2(dy,dx),sa=-Math.PI/2;
+    if(ang<sa)ang+=Math.PI*2;
+    var cur=sa;
+    for(var i=0;i<segs.length;i++){
+      var arc=segs[i].p*Math.PI*2,end=cur+arc;
+      var a2=ang;if(a2<cur)a2+=Math.PI*2;
+      if(a2>=cur&&a2<end)return i;
+      cur+=arc;
+    }
+    return -1;
+  }
+
+  cvs.addEventListener('mousemove',function(e){
+    var r=cvs.getBoundingClientRect();
+    mx=e.clientX-r.left;my=e.clientY-r.top;
+    var h=hitSeg(mx,my);
+    if(h!==hov){hov=h;if(done)draw()}
+    cvs.style.cursor=h>=0?'pointer':'default';
+  });
+  cvs.addEventListener('mouseleave',function(){mx=my=-1;hov=-1;if(done)draw();cvs.style.cursor='default'});
+  /* touch support for mobile */
+  cvs.addEventListener('touchstart',function(e){
+    var t=e.touches[0],r=cvs.getBoundingClientRect();
+    mx=t.clientX-r.left;my=t.clientY-r.top;
+    var h=hitSeg(mx,my);
+    if(h!==hov){hov=h;if(done)draw()}
+    if(h>=0)e.preventDefault();
+  },{passive:false});
+  cvs.addEventListener('touchend',function(){mx=my=-1;hov=-1;if(done)draw()});
+
+  function draw(){
+    if(W<10||H<10)resize();
+    ctx.save();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+    var cx=W/2,cy=H*0.44,R=Math.min(W,H*0.8)*0.26,r=R*0.55,sa=-Math.PI/2;
+
+    /* ghost track */
+    ctx.beginPath();ctx.arc(cx,cy,R,0,Math.PI*2);ctx.arc(cx,cy,r,Math.PI*2,0,true);ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,0.015)';ctx.fill();
+
+    /* segments */
+    var drawn=prog*Math.PI*2,cur=sa,lbls=[];
+    for(var i=0;i<segs.length;i++){
+      var s=segs[i],arc=s.p*Math.PI*2;
+      var td=Math.min(arc,Math.max(0,drawn-(cur-sa)));
+      if(td<=0){cur+=arc;continue}
+
+      /* pop-out on hover */
+      var ox=0,oy=0;
+      if(i===hov&&done){var ma=cur+arc/2;ox=Math.cos(ma)*10;oy=Math.sin(ma)*10}
+
+      ctx.save();
+      if(i===hov&&done){ctx.shadowColor=s.c;ctx.shadowBlur=18}
+      else if(i===0){ctx.shadowColor='rgba(0,255,136,0.2)';ctx.shadowBlur=10}
+
+      ctx.beginPath();ctx.arc(cx+ox,cy+oy,R,cur,cur+td);ctx.arc(cx+ox,cy+oy,r,cur+td,cur,true);ctx.closePath();
+      ctx.fillStyle=s.c;ctx.globalAlpha=(hov>=0&&i!==hov&&done)?0.4:1;
+      ctx.fill();ctx.globalAlpha=1;
+      ctx.shadowBlur=0;ctx.strokeStyle='rgba(5,5,8,0.6)';ctx.lineWidth=2;ctx.stroke();
+      ctx.restore();
+
+      /* collect label */
+      var segEnd=0;for(var j=0;j<=i;j++)segEnd+=segs[j].p;
+      if(prog>=segEnd-s.p*0.3){
+        var mAng=cur+arc/2,lR=R+36+ox*0.5;
+        lbls.push({x:cx+Math.cos(mAng)*(lR)+ox,y:cy+Math.sin(mAng)*(lR)+oy,t:s.l,c:s.c,rt:Math.cos(mAng)>0,i:i,auto:s.auto});
+      }
+      cur+=arc;
+    }
+
+    /* labels — always short names only */
+    lbls.sort(function(a,b){return a.y-b.y});
+    for(var i=1;i<lbls.length;i++){if(lbls[i].y-lbls[i-1].y<15)lbls[i].y=lbls[i-1].y+15}
+    /* font sizes relative to canvas */
+    var base=Math.min(W,H);
+    var fLbl=Math.max(8,Math.round(base*0.042));
+    var fLblH=Math.max(9,Math.round(base*0.048));
+    var fCenter=Math.max(14,Math.round(base*0.10));
+    var fCenterSub=Math.max(7,Math.round(base*0.04));
+    var fHovTitle=Math.max(7,Math.round(base*0.038));
+    var fHovVal=Math.max(10,Math.round(base*0.05));
+
+    ctx.textBaseline='middle';
+    for(var i=0;i<lbls.length;i++){
+      var lb=lbls[i];ctx.textAlign=lb.rt?'left':'right';
+      var isH=lb.i===hov&&done;
+      ctx.font=(isH?'bold '+fLblH:fLbl)+'px JetBrains Mono,monospace';
+      ctx.fillStyle=lb.c;ctx.globalAlpha=isH?1:0.7;
+      ctx.fillText(lb.t,lb.x+(lb.rt?8:-8),lb.y);
+    }
+    ctx.globalAlpha=1;
+
+    /* center text — shows hovered segment info or default 85% */
+    if(prog>0.2){
+      var a=Math.min(1,(prog-0.2)/0.2);
+      ctx.globalAlpha=a;ctx.textAlign='center';ctx.textBaseline='middle';
+      if(hov>=0&&done){
+        var hs=segs[hov];
+        ctx.font='bold '+fHovTitle+'px JetBrains Mono,monospace';ctx.fillStyle=hs.c;
+        ctx.fillText(hs.l,cx,cy-R*0.15);
+        ctx.font='bold '+fHovVal+'px Space Grotesk,sans-serif';ctx.fillStyle=hs.auto?'#00ff88':'#ff4466';
+        ctx.fillText(hs.auto?'АВТО':'ВРУЧНУЮ',cx,cy+R*0.08);
+      }else{
+        ctx.font='bold '+fCenter+'px Space Grotesk,sans-serif';ctx.fillStyle='#f0f0f5';
+        ctx.fillText('85%',cx,cy-R*0.06);
+        ctx.font=fCenterSub+'px JetBrains Mono,monospace';ctx.fillStyle='#f0f0f5';
+        ctx.fillText('вручную',cx,cy+R*0.15);
+      }
+      ctx.globalAlpha=1;
+    }
+    ctx.restore();
+  }
+
+  function anim(ts){
+    if(!running)return;
+    if(!sT)sT=ts;var t=Math.min(1,(ts-sT)/1500);
+    prog=1-Math.pow(1-t,3);draw();
+    if(t<1)requestAnimationFrame(anim);else done=true;
+  }
+
+  var dObs=new IntersectionObserver(function(e){e.forEach(function(x){
+    if(x.isIntersecting&&!running){running=true;done=false;sT=null;prog=0;resize();if(W<10||H<10){setTimeout(function(){resize();requestAnimationFrame(anim)},200)}else{requestAnimationFrame(anim)}}
+    else if(!x.isIntersecting){running=false;done=false}
+  })},{threshold:.05});
+  dObs.observe(box);
+})();
+
+/* currentSection synced via navObs above */
+
+/* ═══════════════════════════════════════════════
+   SAFETY FALLBACK — force reveal if IntersectionObserver fails
+   (e.g. Telegram in-app browser, old WebViews)
+   ═══════════════════════════════════════════════ */
+setTimeout(function(){
+  document.querySelectorAll('.r:not(.v)').forEach(function(el){el.classList.add('v')});
+},3000);
+
+/* ═══ MOBILE CANVAS SAFETY — force resize on orientation/load ═══ */
+function forceCanvasResize(){
+  window.dispatchEvent(new Event('resize'));
+  /* Re-trigger IntersectionObserver by scrolling 1px */
+  var y=window.scrollY;
+  window.scrollTo(0,y+1);
+  setTimeout(function(){window.scrollTo(0,y)},50);
+}
+window.addEventListener('orientationchange',function(){
+  setTimeout(forceCanvasResize,200);
+  setTimeout(forceCanvasResize,600);
+  setTimeout(forceCanvasResize,1200);
+});
+window.addEventListener('load',function(){
+  setTimeout(forceCanvasResize,500);
+  setTimeout(forceCanvasResize,1500);
+});
+/* Also on screen.orientation change (newer API) */
+if(screen.orientation){screen.orientation.addEventListener('change',function(){
+  setTimeout(forceCanvasResize,200);
+  setTimeout(forceCanvasResize,600);
+});}
+</script>
+</body>
+</html>
