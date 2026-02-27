@@ -487,9 +487,8 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .inner{padding:6px 12px !important}
   h2{font-size:clamp(14px,2.5vw,22px) !important;margin-bottom:3px !important}
   .desc{font-size:clamp(9px,1.1vw,13px) !important;line-height:1.4 !important}
-  /* .label (green slide number) — SAME size on ALL slides, explicit per-slide */
-  .label{font-size:clamp(7px,.7vw,9px) !important;margin-bottom:3px !important}
-  #s1 .label,#s2 .label,#s3 .label,#s4 .label,#s5 .label,#s6 .label,#s7 .label,#s8 .label,#s9 .label{font-size:clamp(7px,.7vw,9px) !important}
+  /* .label (green slide number) — FIXED 8px on ALL slides */
+  .label,.s .label,#s1 .label,#s2 .label,#s3 .label,#s4 .label,#s5 .label,#s6 .label,#s7 .label,#s8 .label,#s9 .label{font-size:8px !important;letter-spacing:1px !important;margin-bottom:3px !important}
 
   /* Slide 3 — smaller to fit on 1 screen */
   #s3 h2{font-size:clamp(13px,2.5vw,20px) !important;margin-bottom:3px !important;line-height:1.12 !important}
