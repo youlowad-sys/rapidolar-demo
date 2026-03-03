@@ -453,8 +453,12 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .cta-btn{padding:12px 24px;font-size:clamp(13px,3.5vw,16px)}
 
   /* Claims table */
-  .cl-wrap{-webkit-overflow-scrolling:touch}
-  .cl-t{min-width:460px}
+  .cl-wrap{-webkit-overflow-scrolling:touch;overflow-x:hidden !important}
+  .cl-t{min-width:0 !important;width:100% !important;font-size:clamp(9px,2.3vw,11px) !important}
+  .cl-t th,.cl-t td{padding:6px 4px !important}
+  .cl-t th:nth-child(3),.cl-t td:nth-child(3){display:none !important}
+  #s10{padding:clamp(20px,3vh,40px) 0 !important}
+  #s10 h2{font-size:clamp(18px,5vw,24px) !important}
 
   /* Timeline (s5) */
   .tl-l{font-size:clamp(6px,1.5vw,8px)}
