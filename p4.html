@@ -452,12 +452,15 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   /* CTA */
   .cta-btn{padding:12px 24px;font-size:clamp(13px,3.5vw,16px)}
 
-  /* Claims table */
+  /* Claims table — all 3 columns, compact */
   .cl-wrap{-webkit-overflow-scrolling:touch;overflow-x:hidden !important}
-  .cl-t{min-width:0 !important;width:100% !important;font-size:clamp(9px,2.3vw,11px) !important}
-  .cl-t th,.cl-t td{padding:6px 4px !important}
-  .cl-t th:nth-child(3),.cl-t td:nth-child(3){display:none !important}
-  #s10{padding:clamp(20px,3vh,40px) 0 !important}
+  .cl-t{min-width:0 !important;width:100% !important;font-size:clamp(7px,1.8vw,9px) !important;table-layout:fixed !important}
+  .cl-t th,.cl-t td{padding:4px 3px !important;word-wrap:break-word !important;overflow-wrap:break-word !important}
+  .cl-t th:nth-child(1),.cl-t td:nth-child(1){width:28% !important}
+  .cl-t th:nth-child(2),.cl-t td:nth-child(2){width:45% !important}
+  .cl-t th:nth-child(3),.cl-t td:nth-child(3){width:27% !important}
+  .cl-t code{font-size:inherit !important;word-break:break-all !important}
+  #s10{padding:clamp(16px,2.5vh,32px) 0 !important}
   #s10 h2{font-size:clamp(18px,5vw,24px) !important}
 
   /* Timeline (s5) */
