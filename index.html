@@ -7,7 +7,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>RAPIDOLAR — Tech Demo</title>
+<title>rapiDOLAR — Tech Demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -436,11 +436,12 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .txn-timer{font-size:clamp(18px,5vw,28px)}
 
   /* Transaction metrics — 3 columns */
-  .txn-metrics{gap:6px}
-  .txn-m{padding:8px 6px}
-  .txn-m__n{font-size:clamp(18px,4.5vw,28px)}
-  .txn-m__t{font-size:clamp(6px,1.5vw,8px);letter-spacing:0.5px}
-  .txn-m__d{font-size:clamp(8px,2vw,10px)}
+  .txn-metrics{gap:8px}
+  .txn-m{padding:10px 8px}
+  .txn-m__n{font-size:clamp(22px,5.5vw,32px)}
+  .txn-m__t{font-size:clamp(8px,2.2vw,11px);letter-spacing:0.5px;color:#fff !important}
+  .txn-m__d{font-size:clamp(10px,2.6vw,13px);color:rgba(200,200,220,.85) !important}
+  #s6 .desc{color:rgba(200,200,220,.85) !important}
 
   /* ROI */
   .roi-m{font-size:clamp(9px,2.3vw,11px)}
@@ -452,9 +453,16 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   /* CTA */
   .cta-btn{padding:12px 24px;font-size:clamp(13px,3.5vw,16px)}
 
-  /* Claims table */
-  .cl-wrap{-webkit-overflow-scrolling:touch}
-  .cl-t{min-width:460px}
+  /* Claims table — all 3 columns, compact */
+  .cl-wrap{-webkit-overflow-scrolling:touch;overflow-x:hidden !important}
+  .cl-t{min-width:0 !important;width:100% !important;font-size:clamp(7px,1.8vw,9px) !important;table-layout:fixed !important}
+  .cl-t th,.cl-t td{padding:4px 3px !important;word-wrap:break-word !important;overflow-wrap:break-word !important}
+  .cl-t th:nth-child(1),.cl-t td:nth-child(1){width:28% !important}
+  .cl-t th:nth-child(2),.cl-t td:nth-child(2){width:45% !important}
+  .cl-t th:nth-child(3),.cl-t td:nth-child(3){width:27% !important}
+  .cl-t code{font-size:inherit !important;word-break:break-all !important}
+  #s10{padding:clamp(16px,2.5vh,32px) 0 !important}
+  #s10 h2{font-size:clamp(18px,5vw,24px) !important}
 
   /* Timeline (s5) */
   .tl-l{font-size:clamp(6px,1.5vw,8px)}
@@ -469,35 +477,119 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .mesh__b:nth-child(n+4){display:none}
   body::after{opacity:.002}
 
-  /* S2+S3 portrait: animation between title and body */
+  /* S1 portrait: bigger label, desc, stats layout */
+  #s1 .label { font-size: clamp(10px,2.8vw,14px) !important; letter-spacing: 1.5px !important; }
+  #s1 .desc { font-size: clamp(14px,3.5vw,17px) !important; }
+  #s1 .h-stat__n { font-size: clamp(28px,7.5vw,38px) !important; }
+  #s1 .h-stat__l { font-size: clamp(7px,2vw,10px) !important; }
+  #s1 .h-stat__l span[style*="color"] { display: block !important; margin-top: 2px !important; }
+
+  /* S2+S3+S4 portrait: animation between title and body */
   #s2.s--split > .half,
-  #s3.s--split > .half {
+  #s3.s--split > .half,
+  #s4.s--split > .half {
     display: contents !important;
   }
-  #s2.s--split, #s3.s--split {
-    padding: 0 clamp(10px,3vw,16px) !important;
+  #s2.s--split, #s3.s--split, #s4.s--split {
+    padding: clamp(8px,1.5vh,16px) clamp(10px,3vw,16px) 0 !important;
+  }
+  /* Restore z-index lost from display:contents on .half */
+  #s2 .label, #s2 h2, #s2 .desc, #s2 .pipe-viz,
+  #s3 .label, #s3 h2, #s3 .desc, #s3 .donut-viz, #s3 ul, #s3 blockquote,
+  #s4 .label, #s4 h2, #s4 .desc, #s4 .orbit-viz, #s4 ul {
+    position: relative !important;
+    z-index: 5 !important;
   }
 
-  /* S2: label → h2 → pipe → desc */
-  #s2 .label { order: 1 !important; }
-  #s2 h2 { order: 2 !important; }
-  #s2 .pipe-viz { order: 3 !important; width: 100% !important; height: clamp(220px,55vw,300px) !important; }
-  #s2 .desc { order: 4 !important; }
+  /* S2: restore gradient, push content below dark zone */
+  #s2.s--split {
+    padding-top: clamp(40px,7vh,60px) !important;
+  }
 
-  /* S3: label → h2 → first desc → donut → rest */
-  #s3 .label { order: 1 !important; }
+  /* S2: label → h2 → desc1 → pipe → desc2 */
+  #s2 .label { order: 1 !important; text-align: center !important; }
+  #s2 h2 { order: 2 !important; }
+  #s2 .desc.d2 { order: 3 !important; }
+  #s2 .pipe-viz { order: 4 !important; width: 100% !important; height: clamp(160px,42vw,220px) !important; margin-bottom: 10px !important; }
+  #s2 .desc.d3 { order: 5 !important; }
+  #s2 .desc { font-size: clamp(13px,3.3vw,16px) !important; }
+
+  /* S3: label → h2 → desc1 → "кто делает 85%?" → donut → list → desc4 → blockquote */
+  #s3 .label { order: 1 !important; text-align: center !important; }
   #s3 h2 { order: 2 !important; }
   #s3 .desc.d2 { order: 3 !important; }
-  #s3 .donut-viz { order: 4 !important; width: 100% !important; height: clamp(220px,55vw,300px) !important; }
-  #s3 .desc.d3, #s3 .desc.d4 { order: 5 !important; }
-  #s3 ul { order: 5 !important; }
-  #s3 blockquote { order: 6 !important; }
+  #s3 .desc.d3 { order: 4 !important; margin-top: 2px !important; font-size: clamp(13px,3.3vw,16px) !important; color: var(--t1) !important; }
+  #s3 .donut-viz { order: 5 !important; width: 100% !important; height: clamp(200px,52vw,260px) !important; margin: 20px 0 4px !important; }
+  #s3 ul { order: 6 !important; margin: 2px 0 !important; }
+  #s3 .desc.d4 { order: 7 !important; margin-top: 10px !important; }
+  #s3 blockquote { order: 8 !important; }
 
   /* S3 smaller text */
-  #s3 h2 { font-size: clamp(16px,4.5vw,22px) !important; }
-  #s3 .desc { font-size: clamp(11px,2.8vw,14px) !important; }
-  #s3 ul { font-size: clamp(10px,2.5vw,12px) !important; }
-  #s3 blockquote { font-size: clamp(12px,3vw,15px) !important; padding: 10px 0 10px 14px !important; }
+  #s3 h2 { font-size: clamp(15px,4.2vw,20px) !important; line-height: 1.15 !important; }
+  #s3 .desc { font-size: clamp(10px,2.6vw,13px) !important; margin-top: 4px !important; }
+  #s3 ul { font-size: clamp(9px,2.3vw,11px) !important; line-height: 1.5 !important; }
+  #s3 blockquote { font-size: clamp(11px,2.8vw,14px) !important; padding: 8px 0 8px 14px !important; margin-top: 6px !important; }
+
+  /* S4: full-width left-aligned, use entire screen */
+  #s4.s--split {
+    align-items: flex-start !important;
+    padding: clamp(10px,2vh,20px) clamp(12px,3vw,18px) clamp(6px,1vh,12px) !important;
+  }
+  #s4 .label {
+    width: 100% !important;
+    text-align: center !important;
+  }
+  #s4 h2, #s4 .desc, #s4 .orbit-viz, #s4 ul {
+    width: 100% !important;
+    text-align: left !important;
+  }
+
+  /* S4: label → h2 → desc → orbit → list → desc4 */
+  #s4 .label { order: 1 !important; font-size: clamp(10px,2.8vw,14px) !important; letter-spacing: 1.5px !important; }
+  #s4 h2 { order: 2 !important; font-size: clamp(22px,6.5vw,30px) !important; line-height: 1.15 !important; }
+  #s4 .desc.d2 { order: 3 !important; font-size: clamp(14px,3.8vw,18px) !important; margin-top: 4px !important; }
+  #s4 .orbit-viz { order: 4 !important; width: 100% !important; height: clamp(200px,52vw,260px) !important; margin: 8px 0 !important; }
+  #s4 ul { order: 5 !important; font-size: clamp(12px,3.2vw,15px) !important; line-height: 1.45 !important; margin: 0 !important; }
+  #s4 ul li { margin-bottom: 3px !important; }
+  #s4 .desc.d4 { order: 6 !important; font-size: clamp(12px,3.2vw,15px) !important; margin-top: 6px !important; }
+
+  /* S7: cinema frame — fill screen, compact elements */
+  #s7 { min-height: 100vh !important; min-height: 100dvh !important; }
+  #s7 .inner { padding: 6px 8px !important; display: flex !important; flex-direction: column !important; height: 100vh !important; height: 100dvh !important; }
+  #s7 .cine { flex: 1 !important; min-height: 0 !important; max-height: none !important; border-radius: 8px !important; margin-top: 4px !important; }
+  /* Server bar compact */
+  #s7 .cine-server-bar { padding: 5px 10px !important; font-size: 8px !important; gap: 5px !important; }
+  #s7 .srv-uptime { font-size: 9px !important; }
+  /* Tabs — show labels */
+  #s7 .cine-tab { padding: 8px 4px !important; font-size: 8px !important; gap: 4px !important; }
+  #s7 .cine-tab__num { width: 16px !important; height: 16px !important; font-size: 7px !important; }
+  #s7 .cine-tab .tab-label { display: inline !important; font-size: 8px !important; }
+  /* Left panel (dashboard) */
+  #s7 .cine-left { height: 200px !important; }
+  #s7 .cine-topbar { height: 28px !important; padding: 0 6px !important; gap: 6px !important; }
+  #s7 .ct-val { font-size: 10px !important; }
+  #s7 .ct-label { font-size: 5px !important; }
+  #s7 .ct-sep { height: 14px !important; }
+  #s7 .ct-badge { font-size: 6px !important; padding: 2px 5px !important; }
+  /* Scale down animation content inside left panel */
+  #s7 .sc-layer { transform: scale(0.7) !important; transform-origin: top center !important; }
+  /* Right panel (steps) — smaller window */
+  #s7 .cine-right { min-height: 0 !important; flex: none !important; height: 200px !important; padding: 8px 14px !important; }
+  #s7 .ann-icon { width: 28px !important; height: 28px !important; margin-bottom: 4px !important; border-radius: 8px !important; }
+  #s7 .ann-icon svg { width: 16px !important; height: 16px !important; }
+  #s7 .ann-step { font-size: 8px !important; margin-bottom: 2px !important; letter-spacing: 1.5px !important; }
+  #s7 .ann-title { font-size: 14px !important; margin-bottom: 4px !important; }
+  #s7 .ann-desc { font-size: 11px !important; line-height: 1.4 !important; margin-bottom: 6px !important; }
+  #s7 .ann-highlight { font-size: 9px !important; padding: 5px 8px !important; margin-bottom: 6px !important; }
+  #s7 .ann-metric__val { font-size: 18px !important; }
+  #s7 .ann-metric__label { font-size: 7px !important; }
+  #s7 .ann-metric { margin-bottom: 4px !important; }
+  #s7 .ann-dots { padding-top: 6px !important; gap: 6px !important; }
+  /* Metrics footer — single line */
+  #s7 .cine-metrics { padding: 5px 8px !important; flex-wrap: nowrap !important; gap: 4px !important; justify-content: space-between !important; }
+  #s7 .cm-label { font-size: 5px !important; letter-spacing: 0.5px !important; }
+  #s7 .cm-val { font-size: 9px !important; }
+  #s7 .cm-item { gap: 2px !important; }
 }
 
 /* ═══════════════════════════════════════════════
@@ -538,12 +630,14 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .s--split ul{font-size:clamp(6px,.8vw,9px) !important;line-height:1.3 !important;margin:1px 0 !important}
   .s--split ul li{margin-bottom:0 !important}
   #s3 p.desc{margin-top:0 !important;margin-bottom:0 !important}
-  #s3 p.desc.d3{margin-top:10px !important}
-  #s3 p.desc.d4{margin-top:8px !important}
-  #s3 ul{font-size:clamp(9px,1.2vw,13px) !important;line-height:1.4 !important;margin:0 !important}
-  #s3 blockquote{font-size:clamp(9px,1.1vw,12px) !important;padding:2px 0 2px 6px !important;margin:1px 0 0 !important;line-height:1.35 !important}
-  .orbit-li{font-size:clamp(8px,1vw,12px) !important;margin-bottom:1px !important;line-height:1.35 !important}
-  #s4 .desc{font-size:clamp(8px,1vw,11px) !important}
+  #s3 p.desc.d3{margin-top:4px !important}
+  #s3 p.desc.d4{margin-top:3px !important}
+  #s3 ul{font-size:clamp(7px,1vw,11px) !important;line-height:1.25 !important;margin:0 !important}
+  #s3 ul li{margin-bottom:0 !important}
+  #s3 blockquote{font-size:clamp(7px,.9vw,10px) !important;padding:2px 0 2px 6px !important;margin:1px 0 0 !important;line-height:1.25 !important}
+  .orbit-li{font-size:clamp(7px,.9vw,11px) !important;margin-bottom:0 !important;line-height:1.25 !important}
+  #s4 .desc{font-size:clamp(7px,.9vw,10px) !important;margin-top:1px !important}
+  #s4 h2{font-size:clamp(12px,2vw,18px) !important;margin-bottom:2px !important}
 
   /* Timeline (s5) — compact */
   .tl-detail{font-size:clamp(7px,.9vw,10px) !important;padding:4px !important}
@@ -556,11 +650,13 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .txn-dot{width:18px !important;height:18px !important}
   .txn-lbl{font-size:clamp(5px,.6vw,7px) !important}
   .txn-sub{font-size:4px !important}
-  .txn-metrics{gap:8px !important}
-  .txn-m{padding:8px 12px !important}
+  #s6 .desc{display:none !important}
+  .txn-flow{margin-top:4px !important;margin-bottom:4px !important}
+  .txn-metrics{gap:6px !important}
+  .txn-m{padding:4px 8px !important}
   .txn-m__n{font-size:clamp(12px,1.8vw,18px) !important}
-  .txn-m__t{font-size:clamp(8px,1.1vw,12px) !important;color:var(--t1) !important}
-  .txn-m__d{font-size:clamp(8px,1.1vw,12px) !important;line-height:1.4 !important;color:var(--t1) !important}
+  .txn-m__t{font-size:clamp(6px,.8vw,10px) !important;color:var(--t1) !important}
+  .txn-m__d{font-size:clamp(6px,.8vw,10px) !important;line-height:1.3 !important;color:var(--t1) !important}
 
   /* Slide dividers — visible separation between slides */
   #s7,#s8{border-top:2px solid rgba(0,255,136,.25) !important;box-shadow:inset 0 1px 0 rgba(0,255,136,.1) !important}
@@ -625,11 +721,20 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   .sum-card__val{font-size:12px !important}
   .sum-card__label{font-size:5px !important;letter-spacing:.5px !important;margin-top:2px !important}
 
-  /* ROI (s8) */
-  .roi-card{padding:6px !important}
-  .roi-m{font-size:clamp(8px,1vw,11px) !important}
+  /* ROI (s8) — compact for landscape */
+  #s8 .inner{padding:2px 12px !important}
+  #s8 h2{font-size:10px !important;margin-bottom:0 !important}
+  #s8 .desc{display:none !important}
+  .roi-wrap{margin:0 auto !important}
+  .roi-input{margin:2px 0 !important;gap:6px !important}
+  .roi-input label{font-size:8px !important}
+  .roi-input input{font-size:10px !important;padding:3px 6px !important;width:80px !important;border-radius:4px !important}
+  .roi-grid{grid-template-columns:1fr 1fr !important;gap:6px !important}
+  .roi-card{padding:4px 6px !important;border-radius:6px !important}
+  .roi-card__tag{font-size:6px !important;letter-spacing:1px !important;margin-bottom:2px !important}
+  .roi-m{font-size:7px !important;padding:1px 0 !important;line-height:1.3 !important}
   .roi-m__l{color:var(--t1) !important}
-  .roi-card__tag{font-size:clamp(7px,.9vw,9px) !important}
+  .roi-m__v{font-size:7px !important}
 
   /* CTA (s9) */
   .cta-btn{padding:8px 20px !important;font-size:clamp(11px,1.5vw,14px) !important}
@@ -696,12 +801,13 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   <div class="vid-bg"><video webkit-playsinline muted loop playsinline preload="none" data-src="demo-videos/bg-video-1.mp4"></video></div>
   <div class="inner" style="text-align:left;max-width:1100px">
     <div class="label r">Automation-first инфраструктура для high-risk</div>
-    <div class="hero-t r d1" id="scramble">RAPIDOLAR</div>
-    <p class="desc r d2">Единственная на рынке система полного цикла. Весь трафик обрабатывается автоматически — в десятки раз эффективнее ручного конвейера.<br>Не PSP. Не ещё одна площадка. Без операторов. Без хвостов.</p>
+    <div class="hero-t r d1" id="scramble">rapiDOLAR</div>
+    <p class="desc r d2">Единственная на рынке система полного цикла. Весь трафик обрабатывается автоматически — в десятки раз эффективнее ручного конвейера.</p>
+    <p class="desc r d2" style="margin-top:10px;color:var(--t1);font-weight:500">Не PSP. Не ещё одна площадка. Без операторов. Без хвостов.</p>
     <div class="h-stats r d3">
       <div class="h-stat"><div class="h-stat__n"><span class="acc" data-count="100">0</span>%</div><div class="h-stat__l">автоматизация <span style="color:var(--rd)">vs 15% у рынка</span></div></div>
       <div class="h-stat"><div class="h-stat__n">&lt;<span class="acc" data-count="30">0</span>с</div><div class="h-stat__l">на выплату <span style="color:var(--rd)">vs 15 мин у рынка</span></div></div>
-      <div class="h-stat"><div class="h-stat__n"><span class="acc">0.8</span>%</div><div class="h-stat__l">ошибок <span style="color:var(--rd)">vs 7% у рынка</span></div></div>
+      <div class="h-stat"><div class="h-stat__n"><span class="acc">0.8</span>%</div><div class="h-stat__l">апелляций <span style="color:var(--rd)">vs 7% у рынка</span></div></div>
       <div class="h-stat"><div class="h-stat__n"><span class="acc" data-count="0">0</span></div><div class="h-stat__l">сотрудников <span style="color:var(--rd)">vs 50+ в PSP</span></div></div>
     </div>
   </div>
@@ -780,7 +886,7 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
   <div class="half">
     <div class="label r">04 · Полный цикл</div>
     <h2 class="r d1">Не ускоряем операторов.<br>Заменяем их.</h2>
-    <p class="desc r d2">RAPIDOLAR повышает скорость обработки заявок <strong style="color:var(--g)">x30</strong> и качество обработки <strong style="color:var(--g)">x8–9</strong>.</p>
+    <p class="desc r d2">rapiDOLAR повышает скорость обработки заявок <strong style="color:var(--g)">x30</strong> и качество обработки <strong style="color:var(--g)">x8–9</strong>.</p>
     <ul style="list-style:none;padding:0;margin:8px 0 0;line-height:1.9;font-size:clamp(14px,1.15vw,17px)" class="r d3">
       <li class="orbit-li" data-orbit="0" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--cy)">Экосистема</strong> <span style="color:var(--t1)">— превращает банковские счета и кошельки в управляемую структуру. KYC, лимиты, кулдауны — всё под контролем автоматики.</span></li>
       <li class="orbit-li" data-orbit="1" style="color:var(--t2);margin-bottom:6px"><strong style="color:var(--g)">Выплаты</strong> <span style="color:var(--t1)">— система сама проводит переводы, получает подтверждение и прикрепляет чеки.</span></li>
@@ -1172,7 +1278,7 @@ h3{font-family:var(--display);font-size:clamp(19px,2.2vw,26px);font-weight:600;c
       <!-- SERVER STATUS BAR -->
       <div class="cine-server-bar">
         <span class="srv-led"></span>
-        <span class="srv-host">RAPIDOLAR SERVER</span>
+        <span class="srv-host">rapiDOLAR SERVER</span>
         <span class="srv-ver">v2.4.1</span>
         <span class="srv-sep">·</span>
         <span class="srv-status">ONLINE</span>
@@ -1556,10 +1662,8 @@ if(frame)obs.observe(frame);
     <div class="label r">Следующий шаг</div>
     <h2 class="r d1">Покажем на вашем<br>кейсе</h2>
     <p class="desc r d2" style="text-align:center;margin:0 auto clamp(16px,3vh,28px);color:var(--t3)">Берём ваш типовой сценарий: статусы, правила, лимиты, исключения.<br>Показываем, как ложится в систему. Запускаем пилот. 2 недели — вы видите результат.</p>
-    <div class="cta-wrap r d3">
-      <div class="cta-glow"></div>
-      <a href="#" class="cta-btn" id="cta">Назначить демо-звонок</a>
-    </div>
+    <!-- CTA button removed -->
+
   </div>
 </section>
 
@@ -1568,7 +1672,7 @@ if(frame)obs.observe(frame);
      ═══════════════════════════════════════════════ -->
 <section class="s s--free" id="s10" style="padding:clamp(48px,6vh,80px) 0">
   <div class="inner" style="max-width:1000px">
-    <div class="label r">Техническая база</div>
+    <div class="label r">Техническая база — что стоит под капотом</div>
     <h2 class="r d1" style="font-size:clamp(20px,2.5vw,30px)">Факты и доказательства</h2>
     <div class="cl-wrap r d2" style="margin-top:20px">
       <table class="cl-t">
@@ -1641,7 +1745,7 @@ document.querySelectorAll('video[data-src]').forEach(v=>vobs.observe(v));
    ═══════════════════════════════════════════════ */
 const scrEl=document.getElementById('scramble');
 const scr=new Scramble(scrEl);
-const heroObs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!scrEl.dataset.done){scrEl.dataset.done='1';setTimeout(()=>scr.set('RAPIDOLAR'),400)}},{threshold:.5});
+const heroObs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!scrEl.dataset.done){scrEl.dataset.done='1';setTimeout(()=>scr.set('rapiDOLAR'),400)}},{threshold:.5});
 heroObs.observe(scrEl);
 
 /* ═══════════════════════════════════════════════
@@ -1684,8 +1788,10 @@ document.querySelectorAll('.bento__i').forEach(card=>{
    MAGNETIC CTA BUTTON
    ═══════════════════════════════════════════════ */
 const cta=document.getElementById('cta');
+if(cta){
 cta.addEventListener('mousemove',e=>{const r=cta.getBoundingClientRect();const x=e.clientX-r.left-r.width/2;const y=e.clientY-r.top-r.height/2;cta.style.transform=`translate(${x*.25}px,${y*.25}px)`});
 cta.addEventListener('mouseleave',()=>{cta.style.transform='translate(0,0)'});
+}
 
 /* ═══════════════════════════════════════════════
    RIPPLE EFFECT ON CHAOS BUTTONS
@@ -1800,7 +1906,7 @@ document.querySelectorAll('[data-count]').forEach(el=>cntObs.observe(el));
     /* core text */
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.font='bold '+Math.round(Math.min(W,H)*0.048)+'px Space Grotesk,sans-serif';
-    ctx.fillStyle='#f0f0f5';ctx.fillText('RAPIDOLAR',cx,cy-6);
+    ctx.fillStyle='#f0f0f5';ctx.fillText('rapiDOLAR',cx,cy-6);
     ctx.font=Math.round(Math.min(W,H)*0.028)+'px JetBrains Mono,monospace';
     ctx.fillStyle='rgba(0,255,136,0.8)';ctx.fillText('100% цикл',cx,cy+18);
 
@@ -1961,7 +2067,7 @@ function uROI(){
 <div class="roi-m"><span class="roi-m__l">Споры и апелляции/мес</span><span class="roi-m__v">${mDisp.toLocaleString()}</span></div>
 <div class="roi-m"><span class="roi-m__l">Время разрешения спора</span><span class="roi-m__v">2–24 ч</span></div>
 <div class="roi-m"><span class="roi-m__l">Потерянные клиенты</span><span class="roi-m__v">1–3%</span></div></div>
-<div class="roi-card roi-card--a"><div class="roi-card__tag">С RAPIDOLAR</div>
+<div class="roi-card roi-card--a"><div class="roi-card__tag">С rapiDOLAR</div>
 <div class="roi-m"><span class="roi-m__l">Макс. транзакций/час</span><span class="roi-m__v">100,000</span></div>
 <div class="roi-m"><span class="roi-m__l">Время обработки заявки</span><span class="roi-m__v">< 30 сек</span></div>
 <div class="roi-m"><span class="roi-m__l">Ошибки / сбои</span><span class="roi-m__v">0.8%</span></div>
