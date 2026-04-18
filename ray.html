@@ -2115,10 +2115,6 @@ body{padding-top:28px!important}
               <span class="ops-pq-arrow">→</span>
               <span>55% отклонённых игроков никогда не возвращаются. Каждый декл = потерянный LTV навсегда. <span class="ops-term-src">// igamingpaymentsolutions.com</span></span>
             </div>
-            <div class="ops-pq" data-delay="300">
-              <span class="ops-pq-arrow">→</span>
-              <span>Approval rate до 98%. Только за счёт интеллектуального роутинга.</span>
-            </div>
           </div>
         </div>
       </div>
@@ -2205,13 +2201,13 @@ body{padding-top:28px!important}
             <td>Ротация</td>
             <td class="cmp-ok">&#10003; Быстрая ротация счетов</td>
             <td class="cmp-bad">&#10060; Единицы счетов — заморозка = полный стоп</td>
-            <td class="cmp-ray">&#9989; AI-ротация — каждый счёт скорится в реальном времени: лимит, конверсия, кулдаун, риск-профиль</td>
+            <td class="cmp-ray">&#9989; AI-ротация 300+ счетов в реальном времени</td>
           </tr>
           <tr>
             <td>Капитал</td>
             <td class="cmp-ok">&#10003; Есть собственный капитал</td>
             <td class="cmp-bad">&#10060; Pre-funding / security deposit — ваши деньги на линии</td>
-            <td class="cmp-ray">&#9989; Собственный working capital — мы фронтим капитал, вы не замораживаете ни рубля</td>
+            <td class="cmp-ray">&#9989; Свой working capital — $0 замороженных у вас</td>
           </tr>
           <tr>
             <td>API</td>
@@ -2223,7 +2219,7 @@ body{padding-top:28px!important}
             <td>Автоматизация</td>
             <td class="cmp-bad">&#10060; Выплаты, закуп, диспуты — всё вручную</td>
             <td class="cmp-ok">&#10003; Автоматизация пайплайна</td>
-            <td class="cmp-ray">&#9989; 100% автоматизация: pay-in → сеттлмент → выплата → диспуты</td>
+            <td class="cmp-ray">&#9989; 100%: pay-in → сеттлмент → выплата → диспуты</td>
           </tr>
           <tr>
             <td>Сеттлмент</td>
@@ -2241,13 +2237,13 @@ body{padding-top:28px!important}
             <td>Блокировки</td>
             <td class="cmp-bad">&#10060; Счета блокируются еженедельно</td>
             <td class="cmp-ok">&#10003; Стабильнее P2P</td>
-            <td class="cmp-ray">&#9989; Предиктивный failover — AI снимает нагрузку со счёта ещё до заморозки</td>
+            <td class="cmp-ray">&#9989; AI снимает нагрузку со счёта до заморозки</td>
           </tr>
           <tr>
             <td>Масштабирование</td>
             <td class="cmp-bad">&#10060; Масштабирование = пропорциональный рост рисков</td>
             <td class="cmp-bad">&#10060; «Smart routing» = маркетинг без ML</td>
-            <td class="cmp-ray">&#9989; AI-ротация — трафик перераспределяется за миллисекунды</td>
+            <td class="cmp-ray">&#9989; Трафик перераспределяется за миллисекунды</td>
           </tr>
           <tr>
             <td>Онбординг</td>
@@ -3034,7 +3030,7 @@ if(cmpTable){
   const modules=[
     {id:'AS',name:'AI-скоринг транзакций',desc:'Adaptive scoring за <1ms выбирает оптимальный канал и направляет платёж на счёт с максимальной вероятностью успеха. Лимиты, конверсия, cooldown \u2014 всё учтено.',chips:['AI-РОУТИНГ','AUTO-BALANCE'],tags:[{t:'+15% конверсия',c:'conv'},{t:'\u2191 GGR',c:'up'},{t:'\u00d7100 скорость',c:'sec'}]},
     {id:'CB',name:'AI-классификация + Circuit Breaker',desc:'AI мониторит здоровье каждого канала и предсказывает блокировки ДО того, как они случатся. Каскадом переводит трафик на следующий канал за миллисекунды.',chips:['ZERO DOWNTIME','CASCADE FAILOVER','PREDICTIVE BLOCKING'],tags:[{t:'+3% конверсия',c:'conv'},{t:'+ uptime',c:'up'},{t:'-7% диспутов',c:'disp'}]},
-    {id:'FX',name:'AI-конверт \u2014 авто-покупка стейблкоинов',desc:'AI мониторит балансы, выбирает оптимальный момент и курс, конвертирует ARS в USDT и отправляет сеттлмент на счёт оператора. T+0, полный цикл без единой ручной операции.',chips:['AUTO CRYPTO SETTLEMENT'],tags:[{t:'\u00d750 скорость',c:'sec'},{t:'-% MDR',c:'up'}]},
+    {id:'FX',name:'AI-конвертация \u2014 авто-покупка стейблкоинов',desc:'AI мониторит балансы, выбирает оптимальный момент и курс, конвертирует ARS в USDT и отправляет сеттлмент на счёт оператора. T+0, полный цикл без единой ручной операции.',chips:['AUTO CRYPTO SETTLEMENT'],tags:[{t:'\u00d750 скорость',c:'sec'},{t:'-% MDR',c:'up'}]},
     {id:'VR',name:'Vision OCR \u2014 авто-закрытие апелляций',desc:'7-шаговый автоматический цикл обработки диспута \u2192 AI Vision OCR извлекает данные из скриншота чека, находит платёж в базе, сверяет сумму. Точность 97%.',chips:['AUTO-RESOLVE'],tags:[{t:'-45% диспутов',c:'disp'},{t:'\u00d7100 скорость',c:'sec'}]},
     {id:'IM',name:'AI Matching & Reconciliation',desc:'Данные с опечаткой, сумма \u00b15%, несколько чеков вместо одного \u2014 AI матчит автоматически. Каждый незаматченный платёж = потерянный клиент. AI их не теряет.',chips:['FUZZY MATCHING','SPLIT PAYMENTS'],tags:[{t:'+5% конверсия',c:'conv'},{t:'-15% диспутов',c:'disp'}]},
     {id:'AF',name:'AI Антифрод защита выплат',desc:'Мультиаккаунт, бонус-абьюз, дробление выплат \u2014 AI ловит паттерны, которые не видны на уровне одной транзакции. Ваши деньги не уходят фродерам.',chips:['PAYOUT ANOMALY SHIELD','ANTI-FRAUD','PATTERN DETECTION'],tags:[{t:'\u2191 GGR',c:'up'},{t:'\u2193 fraud',c:'fraud'}]}
