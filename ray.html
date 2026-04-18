@@ -2093,7 +2093,7 @@ body{padding-top:28px!important}
             </div>
             <div class="ops-pq" data-delay="300">
               <span class="ops-pq-arrow">→</span>
-              <span>Операторы фиксируют рост LTV в 2.5 раза после переключения на мгновенные выплаты.</span>
+              <span>Операторы фиксируют рост LTV в 2.5 раза после переключения на мгновенные выплаты. <span class="ops-term-src">// 0xProcessing</span></span>
             </div>
           </div>
         </div>
@@ -2121,7 +2121,6 @@ body{padding-top:28px!important}
 
     </div><!-- /ops-dual -->
 
-    <p class="ops-ai-footnote rv">Каждый этап усилен модулем AI.</p>
 
   </div>
 </section>
@@ -2174,7 +2173,6 @@ body{padding-top:28px!important}
       </div>
     </div><!-- /orbital-wrap -->
 
-    <p class="prop-label rv" style="margin-top:24px;color:var(--acid);text-shadow:0 0 20px rgba(80,200,120,.3);text-transform:none">Собственная технология.</p>
   </div>
 </section>
 
@@ -2213,7 +2211,7 @@ body{padding-top:28px!important}
             <td>API</td>
             <td class="cmp-bad">&#10060; Нет банковского API — автоматизирован только Pay-in</td>
             <td class="cmp-ok">&#10003; Корп. счета + API</td>
-            <td class="cmp-ray">&#9989; 300+ корп. счетов + банковский API</td>
+            <td class="cmp-ray">&#9989; Корп. счета + банковский API</td>
           </tr>
           <tr>
             <td>Автоматизация</td>
@@ -2272,7 +2270,7 @@ body{padding-top:28px!important}
           <tr>
             <td>Диспуты</td>
             <td class="cmp-bad">&#10060; 5-8% — ручная обработка</td>
-            <td class="cmp-neutral">2-4% — частичная автоматизация</td>
+            <td class="cmp-neutral">1-2% — частичная автоматизация</td>
             <td class="cmp-ray">&#9989; &lt; 0.5%</td>
           </tr>
         </tbody>
@@ -3031,7 +3029,7 @@ if(cmpTable){
     {id:'AS',name:'AI-скоринг транзакций',desc:'Adaptive scoring за <1ms выбирает оптимальный канал и направляет платёж на счёт с максимальной вероятностью успеха. Лимиты, конверсия, cooldown \u2014 всё учтено.',chips:['AI-РОУТИНГ','AUTO-BALANCE'],tags:[{t:'+15% конверсия',c:'conv'},{t:'\u2191 GGR',c:'up'},{t:'\u00d7100 скорость',c:'sec'}]},
     {id:'CB',name:'AI-классификация + Circuit Breaker',desc:'AI мониторит здоровье каждого канала и предсказывает блокировки ДО того, как они случатся. Каскадом переводит трафик на следующий канал за миллисекунды.',chips:['ZERO DOWNTIME','CASCADE FAILOVER','PREDICTIVE BLOCKING'],tags:[{t:'+3% конверсия',c:'conv'},{t:'+ uptime',c:'up'},{t:'-7% диспутов',c:'disp'}]},
     {id:'FX',name:'AI-конвертация \u2014 авто-покупка стейблкоинов',desc:'AI мониторит балансы, выбирает оптимальный момент и курс, конвертирует ARS в USDT и отправляет сеттлмент на счёт оператора. T+0, полный цикл без единой ручной операции.',chips:['AUTO CRYPTO SETTLEMENT'],tags:[{t:'\u00d750 скорость',c:'sec'},{t:'-% MDR',c:'up'}]},
-    {id:'VR',name:'Vision OCR \u2014 авто-закрытие апелляций',desc:'7-шаговый автоматический цикл обработки диспута \u2192 AI Vision OCR извлекает данные из скриншота чека, находит платёж в базе, сверяет сумму. Точность 97%.',chips:['AUTO-RESOLVE'],tags:[{t:'-45% диспутов',c:'disp'},{t:'\u00d7100 скорость',c:'sec'}]},
+    {id:'VR',name:'Vision OCR \u2014 авто-закрытие апелляций',desc:'7-шаговый автоматический цикл обработки диспута \u2192 AI Vision OCR извлекает данные из скриншота чека, находит платёж в базе, сверяет сумму. Точность 97%.',chips:['AUTO-RESOLVE'],tags:[{t:'-45% диспутов',c:'disp'},{t:'\u00d7500 скорость',c:'sec'}]},
     {id:'IM',name:'AI Matching & Reconciliation',desc:'Данные с опечаткой, сумма \u00b15%, несколько чеков вместо одного \u2014 AI матчит автоматически. Каждый незаматченный платёж = потерянный клиент. AI их не теряет.',chips:['FUZZY MATCHING','SPLIT PAYMENTS'],tags:[{t:'+5% конверсия',c:'conv'},{t:'-15% диспутов',c:'disp'}]},
     {id:'AF',name:'AI Антифрод защита выплат',desc:'Мультиаккаунт, бонус-абьюз, дробление выплат \u2014 AI ловит паттерны, которые не видны на уровне одной транзакции. Ваши деньги не уходят фродерам.',chips:['PAYOUT ANOMALY SHIELD','ANTI-FRAUD','PATTERN DETECTION'],tags:[{t:'\u2191 GGR',c:'up'},{t:'\u2193 fraud',c:'fraud'}]}
   ];
