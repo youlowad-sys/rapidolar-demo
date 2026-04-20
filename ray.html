@@ -286,6 +286,7 @@ body::after{
 .btn-ghost{background:transparent;color:var(--ivory-muted);padding:8px 0}
 .btn-ghost:hover{color:var(--acid)}
 @media(min-width:768px){.btn{font-size:16px;padding:15px 32px}}
+@media(max-width:480px){.hero-ctas{flex-wrap:nowrap!important}.hero-ctas .btn{font-size:12px;padding:12px 14px}.hero-ctas .btn-primary{flex:0 1 auto}.hero-ctas .btn-tg{flex:1}.hide-mobile-portrait{display:none!important}.final-metrics-row{gap:16px!important}.final-metrics-row span[style*="font-size:36px"]{font-size:26px!important}.final-metrics-row>div{text-align:center}.orbital-wrap>div:first-child{padding:12px 14px!important}.orbital-wrap>div:first-child div:last-child{font-size:12px!important}}
 
 /* === BADGE === */
 .badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase}
@@ -368,11 +369,120 @@ body::after{
 
 .mobile-menu{display:none;position:fixed;inset:0;z-index:99;background:rgba(12,17,32,.97);backdrop-filter:blur(24px);padding:100px 24px 40px;flex-direction:column;gap:0}
 .mobile-menu.open{display:flex}
-.mobile-menu a{font-family:var(--display);font-size:28px;font-weight:600;color:var(--ivory-muted);padding:16px 0;border-bottom:1px solid var(--ivory-line);transition:color .2s}
+.mobile-menu a{font-family:var(--display);font-size:16px;font-weight:600;color:var(--ivory-muted);padding:12px 0;border-bottom:1px solid var(--ivory-line);transition:color .2s}
 .mobile-menu a:hover{color:var(--ivory)}
 .mobile-menu .btn{width:100%;justify-content:center;margin-top:16px}
 
 @media(min-width:1024px){.nav-links{display:flex}.nav-ctas .btn-tg{display:inline-flex}.hamburger{display:none}}
+
+/* === LANDSCAPE MOBILE === */
+@media(max-height:500px) and (min-width:600px){
+  /* Nav: show links, hide burger */
+  .nav{padding:8px 0}
+  .nav.scrolled{padding:6px 0}
+  .nav-logo{font-size:20px}
+  .nav-links{display:flex!important;gap:12px}
+  .nav-links a{font-size:10px;letter-spacing:.06em}
+  .hamburger{display:none!important}
+  .nav-ctas{gap:6px}
+  .nav-ctas .btn{padding:5px 10px;font-size:10px}
+  /* Ticker & Nav */
+  .crt-ticker{height:18px;font-size:8px}
+  .nav{top:18px!important;padding:5px 0!important}
+  /* Hero — two-column layout */
+  .hero{min-height:auto;padding:0 0 12px!important;align-items:center!important}
+  .hero-content{padding-top:28px!important;max-width:100%!important;display:flex!important;flex-wrap:wrap!important;align-items:flex-start!important;gap:0 24px}
+  .hero-eyebrow{font-size:9px!important;margin-bottom:10px!important;width:100%}
+  .hero h1{font-size:clamp(14px,2.2vw,18px)!important;margin-bottom:8px!important;line-height:1.15!important;width:50%}
+  .hero h1 strong{font-size:clamp(18px,3vw,24px)!important;margin-top:2px!important}
+  .hero-sub{font-size:12px!important;margin-bottom:0!important;width:50%;line-height:1.5!important}
+  .hero-metrics{position:absolute!important;right:0;top:28px;bottom:12px!important;width:42%;margin:0!important;display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:1fr 1fr!important;gap:0!important;align-content:stretch!important}
+  .hero-metric{padding:0!important;text-align:center!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important}
+  .hero-metric .value{font-size:clamp(24px,3.5vw,34px)!important}
+  .hero-metric .label{font-size:9px!important;margin-top:3px!important}
+  .hero-ctas{margin-top:8px!important;width:50%}
+  .hero-ctas .btn{padding:6px 14px!important;font-size:11px!important}
+  .hero-geo,.hero-grid-pattern,.hero::before{display:none!important}
+  .hero-bg-number{display:none!important}
+  /* Sections */
+  .sec{padding:20px 0!important}
+  .sec-head{margin-bottom:12px!important}
+  .sec-head h2{font-size:clamp(18px,2.8vw,24px)!important;margin-bottom:4px!important}
+  .sec-head .overline{font-size:9px!important;margin-bottom:6px!important}
+  .sec-head p{font-size:13px!important}
+  /* Pain cards */
+  .pain-layout{gap:8px!important}
+  .pain-card{padding:14px 16px!important}
+  .pain-card .pain-num{font-size:9px!important;margin-bottom:6px!important}
+  .pain-card h3{font-size:14px!important;margin-bottom:6px!important}
+  .pain-card .pain-desc{font-size:11px!important;line-height:1.5!important;margin-bottom:8px!important}
+  .pain-card .pain-quote{font-size:9px!important;padding:6px 10px!important;line-height:1.4!important}
+  .pain-card .pain-stat{font-size:clamp(20px,3vw,28px)!important;margin-bottom:6px!important}
+  /* Stab pain row */
+  .stab-pain-block{padding:12px 14px!important}
+  .stab-pain-block p{font-size:11px!important;line-height:1.4!important}
+  .stab-pain-block .badge{font-size:9px!important;padding:3px 8px!important}
+  .stab-promise{margin-top:10px!important;padding:10px 14px!important}
+  .stab-promise p{font-size:11px!important;line-height:1.4!important}
+  .stab-quote{margin-top:8px!important;padding:8px 14px!important}
+  .stab-quote blockquote{font-size:11px!important;line-height:1.4!important}
+  .stab-quote cite{font-size:9px!important}
+  /* Stability */
+  .stab-grid{gap:16px}
+  /* Gauges */
+  .ops-dual{gap:12px!important;margin-top:12px!important}
+  .ops-gauge-card{padding:0 0 8px!important;display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:auto auto auto!important;gap:0 8px!important}
+  .ops-gauge-tag{padding:4px 14px 3px!important;font-size:9px!important;grid-column:1!important}
+  .ops-gauge-sub{margin:0 0 2px!important;font-size:14px!important;line-height:1.3!important;padding-left:14px!important;padding-right:8px!important;grid-column:1!important}
+  .ops-gauge-sub br{display:none!important}
+  .ops-gauge-sub .ops-term-src{font-size:9px!important}
+  .ops-gauge-canvas-wrap{grid-column:2!important;grid-row:1/4!important;max-height:180px!important;aspect-ratio:1/0.9!important}
+  .ops-gauge-hero-overlay .ops-gauge-hero{font-size:20px!important}
+  .ops-payout-quotes{margin-top:4px!important;padding:6px 10px!important;gap:4px!important}
+  .ops-pq{font-size:10px!important;line-height:1.35!important}
+  .ops-pq .ops-term-src{font-size:8px!important}
+  .ops-gauge-bottom{grid-column:1/-1!important;padding:4px 14px!important}
+  .ops-gauge-bottom p{font-size:7px!important;line-height:1.3!important}
+  .ops-gauge-bottom .ops-term-src{font-size:6px!important}
+  /* Orbital — AI top, canvas left + info right */
+  .orbital-wrap{margin-top:8px!important;display:grid!important;grid-template-columns:1fr 1fr!important;grid-template-rows:auto 1fr!important;gap:4px 8px!important;align-items:stretch!important}
+  .orbital-wrap>div:first-child{grid-column:1/-1!important;padding:8px 14px!important;margin-bottom:0!important}
+  .orbital-wrap>div:first-child span[style*="font-size:32px"]{font-size:22px!important}
+  .orbital-wrap>div:first-child div[style*="font-size:15px"]{font-size:12px!important}
+  .orbital-wrap>div:first-child div[style*="font-size:13px"]{font-size:10px!important;line-height:1.4!important}
+  .orbital-canvas-box{max-height:none!important;aspect-ratio:auto!important;width:100%!important;height:100%!important;overflow:visible!important}
+  .orbital-info{padding:12px 14px!important;min-height:auto!important;align-self:stretch!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;margin-top:0!important}
+  .orbital-info-inner{display:flex!important;flex-wrap:wrap!important;gap:0!important;align-items:baseline!important}
+  .orbital-info-id{font-size:20px!important;min-width:auto!important;margin-right:8px!important}
+  .orbital-info-content{display:contents!important}
+  .orbital-info-title{font-size:11px!important}
+  .orbital-info-desc{font-size:11px!important;margin-top:8px!important;line-height:1.5!important;width:100%!important}
+  .orbital-info-chips{gap:4px!important;margin-top:8px!important;flex-wrap:nowrap!important;width:100%!important}
+  .orbital-info-chips span{font-size:7px!important;padding:2px 6px!important;white-space:nowrap!important}
+  .orbital-wrap .flow-result{grid-column:1/-1!important;margin-top:8px!important;padding:12px!important}
+  .orbital-wrap .flow-result .final-metrics-row{gap:16px!important}
+  .orbital-wrap .flow-result span[style*="font-size:36px"]{font-size:24px!important}
+  .orbital-wrap .flow-result span[style*="font-size:11px"]{font-size:9px!important}
+  /* Comparison */
+  .cmp-wrap{margin-top:24px}
+  /* Geography */
+  .geo-layout{grid-template-columns:1fr auto!important;gap:0!important;align-items:start!important}
+  .geo-map-wrap{justify-content:center!important;align-items:center!important;overflow:hidden!important;height:260px!important;position:relative!important}
+  #geoCanvas{transform:rotate(-90deg) scale(0.65)!important;transform-origin:center center!important;position:absolute!important;left:50%!important;top:50%!important;margin-left:-250px!important;margin-top:-350px!important}
+  .geo-list{margin-left:auto!important}
+  .geo-list{gap:2px!important;width:auto!important;min-width:0!important}
+  .geo-item{padding:4px 8px!important;min-width:0!important}
+  .geo-name{font-size:10px!important}
+  .geo-badge,.geo-status{font-size:7px!important;padding:1px 4px!important}
+  .geo-flag{font-size:11px!important}
+  .geo-item-pulse{display:none!important}
+  /* Final CTA */
+  .final-cta{padding:40px 0}
+  .final-cta h2{font-size:clamp(22px,3.5vw,32px)}
+  /* Footer */
+  .footer{padding:32px 0 16px}
+  .ft-grid{margin-bottom:24px}
+}
 
 /* ==============================================
    4.1 HERO — Cinematic, overlapping, full drama
@@ -611,6 +721,7 @@ body::after{
   .cmp-table{font-size:12px}
   .cmp-table th,.cmp-table td{padding:8px 12px}
 }
+
 
 /* ==============================================
    4.3b БОЛИ — Pain identification (4 cards)
@@ -894,9 +1005,15 @@ body::after{
   .orbital-tag{font-size:9px;padding:3px 7px}
 }
 @media(max-width:480px){
-  .orbital-canvas-box{aspect-ratio:1/1.2;max-height:400px}
-  .orbital-info{padding:16px 18px}
-  .orbital-info-id{font-size:28px;min-width:44px}
+  .orbital-canvas-box{aspect-ratio:1/1.2;max-height:400px;overflow:visible}
+  .orbital-info{padding:14px 16px}
+  .orbital-info-inner{display:block}
+  .orbital-info-id{font-size:22px;min-width:auto;display:inline;margin-right:8px;vertical-align:baseline}
+  .orbital-info-title{font-size:14px;display:inline}
+  .orbital-info-content{display:contents}
+  .orbital-info-desc{font-size:13px;margin-top:8px}
+  .orbital-info-chips{gap:4px}
+  .orbital-info-chips span{font-size:7px;padding:2px 5px;letter-spacing:.04em}
 }
 
 /* --- MDR line --- */
@@ -1702,6 +1819,18 @@ body::after{
 .cmp-wrap.vis .cmp-table tbody tr:nth-child(10){transition-delay:.32s}
 .cmp-wrap.vis .cmp-table tbody tr:nth-child(n+11){transition-delay:.35s}
 
+/* Mobile portrait: hide first column, shrink text */
+@media(max-width:480px){
+  .cmp-table thead th:first-child,
+  .cmp-table tbody td:first-child{display:none!important}
+  .cmp-table{font-size:11px}
+  .cmp-table thead th{padding:8px 6px;font-size:9px}
+  .cmp-table tbody td{padding:8px 6px;font-size:11px}
+  .cmp-table tbody td.cmp-scale{font-size:9px}
+  .cmp-table thead th:nth-child(2),
+  .cmp-table tbody td:nth-child(2){border-right:1px solid rgba(232,240,228,.08)}
+}
+
 /* ==============================================
    4.8 PRICING — Oversized number + gradient mesh
    ============================================== */
@@ -1898,7 +2027,8 @@ input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;hei
 .ft-socials{display:flex;gap:12px}
 .ft-socials a{width:32px;height:32px;border:1px solid var(--ivory-line);display:flex;align-items:center;justify-content:center;color:var(--ivory-muted);font-size:14px;transition:all .3s}
 .ft-socials a:hover{border-color:var(--acid-border);color:var(--acid);transform:translateY(-2px);box-shadow:0 4px 16px rgba(64,224,255,.1)}
-@media(min-width:768px){.ft-grid{grid-template-columns:1.5fr 1fr 1fr 1fr 1fr}}
+@media(max-width:480px){.ft-grid{grid-template-columns:1fr 1fr;gap:16px}.ft-brand{grid-column:1/-1}}
+@media(min-width:768px){.ft-grid{grid-template-columns:1.5fr 1fr 1fr}}
 
 /* ==============================================
    MODAL
@@ -1986,14 +2116,12 @@ body{padding-top:28px!important}
 <div class="diag-grid"></div>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="#pains" onclick="closeMobile()">Проблема</a>
   <a href="#stability" onclick="closeMobile()">Стабильность</a>
-  <a href="#engine" onclick="closeMobile()">Платформа</a>
-  <a href="#coverage" onclick="closeMobile()">Гео</a>
-  <a href="#pricing" onclick="closeMobile()">Тарифы</a>
-  <a href="#developers" onclick="closeMobile()">Разработчикам</a>
-  <a href="#faq" onclick="closeMobile()">FAQ</a>
-  <a href="#" class="btn btn-primary btn-magnetic" onclick="openModal(event)">Заказать демо</a>
+  <a href="#operations" onclick="closeMobile()">Скорость</a>
+  <a href="#how-it-works" onclick="closeMobile()">AI-оркестратор</a>
+  <a href="#comparison" onclick="closeMobile()">Сравнение</a>
+  <a href="#roadmap" onclick="closeMobile()">География</a>
+  <a href="#contact" onclick="closeMobile()">Контакт</a>
   <a href="#" class="btn btn-tg btn-magnetic">Написать в Telegram</a>
 </div>
 
@@ -2018,9 +2146,9 @@ body{padding-top:28px!important}
       <p class="hero-sub rv rv-d2">Гибридный PSP для high-risk в Аргентине. Конверсия на 23% выше, чем у конкурентов, собственный оркестратор, выплата 0.2 секунды, мгновенный сеттлмент.</p>
       <div class="hero-metrics rv rv-d3">
         <div class="hero-metric" style="text-align:center"><div class="value">$0</div><div class="label">Замороженных / свой капитал</div></div>
-        <div class="hero-metric"><div class="value" data-target="0.2" data-suffix="с">0.2с</div><div class="label">Выплаты</div></div>
-        <div class="hero-metric"><div class="value">T+0</div><div class="label">Сеттлмент</div></div>
-        <div class="hero-metric"><div class="value">0</div><div class="label">Ручных операций</div></div>
+        <div class="hero-metric" style="text-align:center"><div class="value" data-target="0.2" data-suffix="с">0.2с</div><div class="label">Выплаты</div></div>
+        <div class="hero-metric" style="text-align:center"><div class="value">T+0</div><div class="label">Сеттлмент</div></div>
+        <div class="hero-metric" style="text-align:center"><div class="value">0</div><div class="label">Ручных операций</div></div>
       </div>
       <div class="hero-ctas rv rv-d4">
         <a href="#" class="btn btn-primary btn-magnetic" onclick="openModal(event)">Заказать демо</a>
@@ -2135,12 +2263,12 @@ body{padding-top:28px!important}
     </div>
 
     <div class="orbital-wrap" id="orbitalWrap" style="margin-top:0">
-      <div style="display:flex;align-items:flex-start;gap:16px;margin:0;padding:16px 20px;border:1px solid var(--ivory-line);margin-bottom:16px;background:rgba(10,21,16,.6)">
-        <span style="font-family:var(--display);font-size:36px;font-weight:800;color:var(--acid);line-height:1;flex-shrink:0">AI</span>
-        <div>
-          <div style="font-family:var(--display);font-size:16px;font-weight:700;color:var(--ivory);margin-bottom:6px">Один мозг координирует всё</div>
-          <div style="font-family:var(--sans);font-size:15px;color:var(--ivory-dim);line-height:1.5">Роутинг транзакций, ротацию 300+ корпоративных счетов, failover, конвертацию, выплаты, диспуты. Все модули, как экосистема, автоматически работают под его управлением — и усиливают друг друга.</div>
+      <div style="margin:0;padding:16px 20px;border:1px solid var(--ivory-line);margin-bottom:16px;background:rgba(10,21,16,.6)">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <span style="font-family:var(--display);font-size:32px;font-weight:800;color:var(--acid);line-height:1;flex-shrink:0">AI</span>
+          <div style="font-family:var(--display);font-size:15px;font-weight:700;color:var(--ivory)">Один мозг координирует всё</div>
         </div>
+        <div style="font-family:var(--sans);font-size:13px;color:var(--ivory-dim);line-height:1.6"><span class="hide-mobile-portrait">Роутинг транзакций, ротацию 300+ корпоративных счетов, failover, конвертацию, выплаты, диспуты. </span>Все модули, как экосистема, автоматически работают под его управлением — и усиливают друг друга.</div>
       </div>
       <div class="orbital-canvas-box">
         <div class="orbital-grid-overlay"></div>
@@ -2163,12 +2291,12 @@ body{padding-top:28px!important}
       <!-- Final result bar -->
       <div class="flow-result" style="margin-top:24px;padding:24px;border:2px solid var(--acid-border);background:rgba(80,200,120,.04);text-align:center">
         <div style="font-family:var(--display);font-size:11px;color:var(--ivory-muted);text-transform:uppercase;letter-spacing:.15em;margin-bottom:12px">Итоговые метрики Ray</div>
-        <div style="display:flex;justify-content:center;gap:36px;flex-wrap:wrap;align-items:flex-end">
+        <div class="final-metrics-row" style="display:flex;justify-content:center;gap:36px;flex-wrap:wrap;align-items:flex-end">
           <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:var(--acid);line-height:1">+23%</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">конверсия</span></div>
           <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:var(--warning);line-height:1">-67%</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">диспутов</span></div>
           <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:#C084FC;line-height:1">&lt;1ms</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">скорость</span></div>
-          <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:#38BDF8;line-height:1">↑ GGR</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">рост дохода оператора</span></div>
-          <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:#38BDF8;line-height:1">↑ LTV</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">удержание игроков</span></div>
+          <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:#38BDF8;line-height:1">↑ GGR</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">рост дохода</span></div>
+          <div><div style="height:36px;display:flex;align-items:flex-end"><span style="font-family:var(--display);font-size:36px;font-weight:800;color:#38BDF8;line-height:1">↑ LTV</span></div><span style="font-family:var(--sans);font-size:11px;color:var(--ivory-dim)">удержание</span></div>
         </div>
       </div>
     </div><!-- /orbital-wrap -->
@@ -2191,7 +2319,7 @@ body{padding-top:28px!important}
             <th class="cmp-th-feat"></th>
             <th class="cmp-th-them">P2P СЕТИ</th>
             <th class="cmp-th-them">КОРП. PSP</th>
-            <th class="cmp-th-ray">RAY (AI-ГИБРИД) ›</th>
+            <th class="cmp-th-ray">RAY (AI-ГИБРИД)</th>
           </tr>
         </thead>
         <tbody>
@@ -2227,7 +2355,7 @@ body{padding-top:28px!important}
           </tr>
           <tr>
             <td>FX</td>
-            <td class="cmp-neutral">Нерегулярный</td>
+            <td class="cmp-neutral">FX нерегулярный</td>
             <td class="cmp-bad">&#10060; FX-закуп вручную через OTC/брокера</td>
             <td class="cmp-ray">&#9989; Авто-конвертация ARS→USDT несколько раз в сутки</td>
           </tr>
@@ -2239,9 +2367,9 @@ body{padding-top:28px!important}
           </tr>
           <tr>
             <td>Масштабирование</td>
-            <td class="cmp-bad">&#10060; Масштабирование = пропорциональный рост рисков</td>
-            <td class="cmp-bad">&#10060; «Smart routing» = маркетинг без ML</td>
-            <td class="cmp-ray">&#9989; Трафик перераспределяется за миллисекунды</td>
+            <td class="cmp-bad cmp-scale">&#10060; Масштабирование = пропорциональный рост рисков</td>
+            <td class="cmp-bad cmp-scale">&#10060; «Smart routing» = маркетинг без ML</td>
+            <td class="cmp-ray cmp-scale">&#9989; Трафик перераспределяется за миллисекунды</td>
           </tr>
           <tr>
             <td>Онбординг</td>
@@ -2257,20 +2385,20 @@ body{padding-top:28px!important}
           </tr>
           <tr>
             <td>PayIn-конверсия</td>
-            <td class="cmp-neutral">~60-73%</td>
-            <td class="cmp-neutral">~70-82%</td>
+            <td class="cmp-neutral">Конверсия ~60-73%</td>
+            <td class="cmp-neutral">Конверсия ~70-82%</td>
             <td class="cmp-ray">&#9989; до 98%</td>
           </tr>
           <tr>
             <td>Скорость выплат</td>
-            <td class="cmp-neutral">Минуты-часы</td>
-            <td class="cmp-neutral">Секунды-минуты</td>
+            <td class="cmp-neutral">Выплаты: минуты-часы</td>
+            <td class="cmp-neutral">Выплаты: секунды-минуты</td>
             <td class="cmp-ray">&#9989; 0.2 секунды</td>
           </tr>
           <tr>
             <td>Диспуты</td>
-            <td class="cmp-bad">&#10060; 5-8% — ручная обработка</td>
-            <td class="cmp-neutral">1-2% — частичная автоматизация</td>
+            <td class="cmp-bad">&#10060; Диспуты 5-8% — ручная обработка</td>
+            <td class="cmp-neutral">Диспуты 1-2% — частичная автоматизация</td>
             <td class="cmp-ray">&#9989; &lt; 0.5%</td>
           </tr>
         </tbody>
@@ -2407,7 +2535,6 @@ body{padding-top:28px!important}
       <div class="ft-brand"><div class="ft-logo" id="ftLogo"><span class="logo-char" data-full="R" data-short="R">R</span><span class="logo-char" data-full="e" data-short="a">e</span><span class="logo-char" data-full="y" data-short="y">y</span><span class="logo-char logo-char-fade" data-full="P">P</span><span class="logo-char logo-char-fade" data-full="a">a</span><span class="logo-char logo-char-fade" data-full="y">y</span></div><p>High-risk процессинг, управляемый AI.</p></div>
       <div class="ft-col"><h4>Решение</h4><a href="#stability">Стабильность</a><a href="#operations">Скорость</a><a href="#how-it-works">AI-оркестратор</a></div>
       <div class="ft-col"><h4>Платформа</h4><a href="#comparison">Сравнение</a><a href="#roadmap">География</a></div>
-      <div class="ft-col"><h4>Связь</h4><a href="#" onclick="openModal(event)">Заказать демо</a><a href="#">Telegram</a></div>
     </div>
     <div class="ft-bottom"><span class="copy">&copy; 2026 Ray. Все права защищены.</span></div>
   </div>
@@ -3075,10 +3202,11 @@ if(cmpTable){
   function drawCenterHub(t){
     centerPulse+=0.02;
     const pulse=Math.sin(centerPulse)*0.15+0.85;
+    const sc=Math.min(W,H)/400;const coreR=Math.max(10,18*sc);const glowR=coreR*2;const dashR=coreR*4;
 
     // Outer rings
     for(let r=3;r>=1;r--){
-      const ringR=28+r*18;
+      const ringR=(coreR*1.5+r*coreR)*sc;
       const alpha=0.06+r*0.02;
       ctx.beginPath();ctx.arc(cx,cy,ringR*pulse,0,Math.PI*2);
       ctx.strokeStyle='rgba('+ACID_RGB.join(',')+','+alpha+')';
@@ -3087,39 +3215,41 @@ if(cmpTable){
 
     // Dashed rotating ring
     ctx.save();ctx.translate(cx,cy);ctx.rotate(t*0.0003);
-    ctx.beginPath();ctx.arc(0,0,72*pulse,0,Math.PI*2);
+    ctx.beginPath();ctx.arc(0,0,dashR*pulse,0,Math.PI*2);
     ctx.setLineDash([4,8]);
     ctx.strokeStyle='rgba('+ACID_RGB.join(',')+',0.12)';
     ctx.lineWidth=1;ctx.stroke();ctx.setLineDash([]);
     ctx.restore();
 
     // Core glow
-    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,36*pulse);
+    const grad=ctx.createRadialGradient(cx,cy,0,cx,cy,glowR*pulse);
     grad.addColorStop(0,'rgba('+ACID_RGB.join(',')+',0.35)');
     grad.addColorStop(0.5,'rgba('+ACID_RGB.join(',')+',0.1)');
     grad.addColorStop(1,'rgba('+ACID_RGB.join(',')+',0)');
-    ctx.beginPath();ctx.arc(cx,cy,36*pulse,0,Math.PI*2);
+    ctx.beginPath();ctx.arc(cx,cy,glowR*pulse,0,Math.PI*2);
     ctx.fillStyle=grad;ctx.fill();
 
     // Core circle
-    ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
+    ctx.beginPath();ctx.arc(cx,cy,coreR,0,Math.PI*2);
     ctx.fillStyle=ACID;ctx.fill();
 
     // Core shadow glow
-    ctx.shadowColor=ACID;ctx.shadowBlur=30;
-    ctx.beginPath();ctx.arc(cx,cy,18,0,Math.PI*2);
+    ctx.shadowColor=ACID;ctx.shadowBlur=Math.max(10,30*sc);
+    ctx.beginPath();ctx.arc(cx,cy,coreR,0,Math.PI*2);
     ctx.fillStyle=ACID;ctx.fill();
     ctx.shadowBlur=0;
 
     // Center text
-    ctx.fillStyle=VOID;ctx.font='bold 11px "JetBrains Mono",monospace';
+    const cFs=Math.max(7,Math.round(11*sc));
+    ctx.fillStyle=VOID;ctx.font='bold '+cFs+'px "JetBrains Mono",monospace';
     ctx.textAlign='center';ctx.textBaseline='middle';
     ctx.fillText('AI',cx,cy);
 
     // Label below core
+    const lFs=Math.max(6,Math.round(9*sc));
     ctx.fillStyle='rgba('+ACID_RGB.join(',')+',0.6)';
-    ctx.font='500 9px "JetBrains Mono",monospace';
-    ctx.fillText('ORCHESTRATOR',cx,cy+32);
+    ctx.font='500 '+lFs+'px "JetBrains Mono",monospace';
+    ctx.fillText('ORCHESTRATOR',cx,cy+coreR*1.8);
   }
 
   // Draw bezier curves from each module through center
@@ -3153,11 +3283,12 @@ if(cmpTable){
 
   // Draw module nodes
   function drawModules(t){
+    const sc=Math.min(W,H)/400;
     for(let i=0;i<6;i++){
       const p=getModulePos(i);
       const glow=moduleGlow[i];
       const isActive=i===activeModule;
-      const nodeR=isActive?26:22;
+      const baseR=Math.min(W,H)*0.07;const nodeR=isActive?baseR*1.18:baseR;
 
       // Glow rings when active
       if(glow>0.01){
@@ -3200,20 +3331,22 @@ if(cmpTable){
 
       // Module ID text
       ctx.fillStyle=isActive?ACID:'rgba(232,240,228,'+(0.6+glow*0.4)+')';
-      ctx.font='bold '+(isActive?15:13)+'px "JetBrains Mono",monospace';
+      const idFs=Math.max(8,Math.round(nodeR*0.6));ctx.font='bold '+idFs+'px "JetBrains Mono",monospace';
       ctx.textAlign='center';ctx.textBaseline='middle';
       ctx.fillText(modules[i].id,p.x,p.y);
 
       // Module name label outside the orbit
       const shortNames=['Скоринг','Circuit\nBreaker','FX-конверт','Vision OCR','Matching','Антифрод'];
-      const labelOffset=p.y>cy?nodeR+14:-(nodeR+6);
+      const lblOff=Math.max(8,nodeR*0.6);
+      const labelOffset=p.y>cy?nodeR+lblOff:-(nodeR+lblOff*0.4);
       const labelY=p.y+labelOffset;
       ctx.fillStyle='rgba(232,240,228,'+(0.4+glow*0.4)+')';
-      ctx.font=(isActive?'600 ':'400 ')+'9px "IBM Plex Mono","JetBrains Mono",monospace';
+      const lblFs=Math.max(6,Math.round(9*sc));
+      ctx.font=(isActive?'600 ':'400 ')+lblFs+'px "IBM Plex Mono","JetBrains Mono",monospace';
       ctx.textAlign='center';ctx.textBaseline=p.y>cy?'top':'bottom';
       const lines=shortNames[i].split('\n');
       lines.forEach((line,li)=>{
-        ctx.fillText(line,p.x,labelY+li*12*(p.y>cy?1:-1));
+        ctx.fillText(line,p.x,labelY+li*(lblFs+2)*(p.y>cy?1:-1));
       });
     }
   }
@@ -3329,9 +3462,14 @@ if(cmpTable){
       const pos=getModulePos(activeModule);
       const xPct=(pos.x/W)*100;
       const yPct=(pos.y/H)*100;
-      // If module is in bottom half, show tags above it; if top half, below
-      const isBottom=pos.y>cy;
+      // Show tags above or below module
+      const isMobile=W<500;
+      // On mobile: AS(0) and CB(1) are top modules — force tags above them
+      const showAbove=isMobile?(activeModule===0||activeModule===1||pos.y>cy):pos.y>cy;
 
+      const tagSpread=isMobile?30:80;
+      const tagYBase=isMobile?32:48;
+      const tagYStep=isMobile?18:22;
       mod.tags.forEach((tag,i)=>{
         const el=document.createElement('div');
         const col=tagColorMap[tag.c]||'#50C878';
@@ -3340,9 +3478,10 @@ if(cmpTable){
         el.style.borderColor=col;
         el.style.background='rgba(10,21,16,.85)';
         el.textContent=tag.t;
-        const spread=(i-(mod.tags.length-1)/2)*80;
-        const yOff=isBottom?-48-i*22:48+i*22;
-        el.style.left='calc('+Math.max(8,Math.min(92,xPct))+'% + '+spread+'px)';
+        const spread=(i-(mod.tags.length-1)/2)*tagSpread;
+        const yOff=showAbove?-tagYBase-i*tagYStep:tagYBase+i*tagYStep;
+        const clampedX=Math.max(15,Math.min(85,xPct));
+        el.style.left='calc('+clampedX+'% + '+spread+'px)';
         el.style.top='calc('+yPct+'% + '+yOff+'px)';
         el.style.transform='translateX(-50%)';
         el.style.transitionDelay=(i*0.1)+'s';
@@ -4133,9 +4272,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       const zoneSegs=this.isSpeed?[
         {to:1.0,color:'rgba(230,57,70,0.85)',glow:'rgba(230,57,70,0.12)',rgb:'230,57,70',label:'P2P · 2 мин — 3 часа',labelPos:0.82},
         {to:0.55,color:'rgba(244,162,97,0.9)',glow:'rgba(244,162,97,0.12)',rgb:'244,162,97',label:'Corp · 2 мин — 15 мин',labelPos:0.38},
-        {to:0.05,color:'rgba(80,200,120,1)',glow:'rgba(80,200,120,0.2)',rgb:'80,200,120',label:'',labelPos:0.025}
+        {to:0.05,color:'rgba(80,200,120,1)',glow:'rgba(80,200,120,0.2)',rgb:'80,200,120',label:'Ray',labelPos:0.025}
       ]:[
-        {to:0.96,color:'rgba(80,200,120,1)',glow:'rgba(80,200,120,0.15)',rgb:'80,200,120',label:'',labelPos:0.88},
+        {to:0.96,color:'rgba(80,200,120,1)',glow:'rgba(80,200,120,0.15)',rgb:'80,200,120',label:'Ray',labelPos:0.88},
         {to:0.76,color:'rgba(244,162,97,0.9)',glow:'rgba(244,162,97,0.12)',rgb:'244,162,97',label:'Corp · 70–82%',labelPos:0.68},
         {to:0.67,color:'rgba(230,57,70,0.85)',glow:'rgba(230,57,70,0.12)',rgb:'230,57,70',label:'P2P · 60–73%',labelPos:0.33}
       ];
@@ -4164,17 +4303,19 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       zoneSegs.forEach(seg=>{
         if(!seg.label)return;
         const labelAngle=startAngle+totalSweep*seg.labelPos;
-        const dist=r+r*0.15;
+        const dist=r+r*0.12;
         const lx=cx+Math.cos(labelAngle)*dist;
         const ly=cy+Math.sin(labelAngle)*dist;
-        ctx.font='bold 14px JetBrains Mono, monospace';
+        const lfs=Math.max(8,Math.round(r*0.09));
+        ctx.font='bold '+lfs+'px JetBrains Mono, monospace';
         ctx.textAlign=labelAngle>Math.PI?'right':'left';
         ctx.textBaseline='middle';
         const tm=ctx.measureText(seg.label);
-        const pad=6;
+        const pad=4;
+        const lh=lfs+4;
         const bx=ctx.textAlign==='right'?lx-tm.width-pad:lx-pad;
         ctx.fillStyle='rgba(10,21,16,0.92)';
-        ctx.fillRect(bx,ly-10,tm.width+pad*2,20);
+        ctx.fillRect(bx,ly-lh/2,tm.width+pad*2,lh);
         ctx.fillStyle=seg.color;
         ctx.fillText(seg.label,lx,ly);
       });
